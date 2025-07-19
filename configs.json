@@ -6,7 +6,7 @@
     "requestHeaders": {
       "Accept": "*/*",
       "Content-Type": "application/json",
-      "X-Api-Key": "ottopaye0jvsmb5gut3axlond82y9z7i",
+      "X-Api-Key": "***",
       "X-Trace-Id": "f48518a8-613d-11f0-bf3a-8add2c647ba"
     },
     "requestBody": {
@@ -19,7 +19,7 @@
     "responseBody": {
       "data": {
         "id": "idm",
-        "id_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiaW5kb21hcmNvIiwiZXhwIjoxODQ2MjIxMTA4LCJpc3MiOiJJbmRvbWFyY28ifQ.iDRCVKNTaJwTNYo-jZqVsfaDdfWNlwUUgOPe_yNcwOk",
+        "id_token": "***",
         "username": "{{body.Username}}"
       },
       "meta": {
@@ -36,7 +36,7 @@
     "path": "/api/inquiry",
     "requestHeaders": {
       "Accept": "*/*",
-      "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiaW5kb21hcmNvIiwiZXhwIjoxODQ2MjIxMTA4LCJpc3MiOiJJbmRvbWFyY28ifQ.iDRCVKNTaJwTNYo-jZqVsfaDdfWNlwUUgOPe_yNcwOk",
+      "Authorization": "Bearer ***",
       "Content-Type": "application/json",
       "X-Trace-Id": "1013435c-613e-11f0-bf3a-8add2c647b68"
     },
@@ -76,12 +76,12 @@
     "path": "/api/payment",
     "requestHeaders": {
       "Accept": "*/*",
-      "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiaW5kb21hcmNvIiwiZXhwIjoxODQ2MjIxMTA4LCJpc3MiOiJJbmRvbWFyY28ifQ.iDRCVKNTaJwTNYo-jZqVsfaDdfWNlwUUgOPe_yNcwOk",
+      "Authorization": "Bearer ***",
       "Content-Type": "application/json",
       "X-Trace-Id": "4f1f8fbd-613e-11f0-bf3a-8add2c647b68"
     },
     "requestBody": {
-      "AdditionalData": "{\"channel\":\"MB\",\"description\":\"\",\"deviceId\":\"BIFAST\",\"postingType\":\"POSTING\",\"receiverAccountNumber\":\"    8481229468763403\",\"receiverBankCode\":\"IAPTIDJA\",\"receiverName\":\"ABC247036709\",\"senderAccountNumber\":\"3831404203\",\"senderBankCode\":\"CENAIDJA\",\"senderName\":\"JULIO HENDRAWAN WIJAYA\",\"sourceAccountNo\":null,\"sourceBankName\":null}",
+      "AdditionalData": "",
       "ChannelType": "BCA",
       "CompanyCode": "8481",
       "CurrencyCode": "IDR",
