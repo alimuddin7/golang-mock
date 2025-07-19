@@ -1,0 +1,50 @@
+version: "3.9"
+
+services:
+  golang-mock:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: golang-mock
+    # networks:
+    #   - unleash-net
+    # image: "docker-regis.ottodigital.id/test/golang-mock:latest"
+    ports:
+      - "9876:3000"
+    volumes:
+      - ./configs.json:/app/configs.json
+    environment:
+      - PORT=8080
+      # - UNLEASH_URL=http://unleash:4242/api
+      # - UNLEASH_APP_NAME=unleash-onboarding-golang
+      # - UNLEASH_ENVIRONMENT=development
+      # - UNLEASH_API_KEY=default:development.5491937da8f246531d5c99dcc61b64d96fbf29101a2205eb70ad1734
+  # db:
+  #   image: postgres:13
+  #   environment:
+  #     POSTGRES_DB: unleash
+  #     POSTGRES_USER: unleash_user
+  #     POSTGRES_PASSWORD: unleash_password
+  #   volumes:
+  #     - pgdata:/var/lib/postgresql/data
+  #   networks:
+  #     - unleash-net
+
+  # unleash:
+  #   image: unleashorg/unleash-server
+  #   ports:
+  #     - "4243:4242"
+  #   environment:
+  #     DATABASE_URL: postgres://unleash_user:unleash_password@db:5432/unleash?sslmode=disable
+  #     INIT_FRONTEND_API_TOKENS: default:development.unleash-token
+  #     LOG_LEVEL: debug
+  #   depends_on:
+  #     - db
+  #   networks:
+  #     - unleash-net
+
+# volumes:
+#   pgdata:
+
+# networks:
+#   unleash-net:

@@ -1,0 +1,136 @@
+[
+  {
+    "name": "token",
+    "method": "POST",
+    "path": "/api/token",
+    "requestHeaders": {
+      "Accept": "*/*",
+      "Content-Type": "application/json",
+      "X-Api-Key": "ottopaye0jvsmb5gut3axlond82y9z7i",
+      "X-Trace-Id": "f48518a8-613d-11f0-bf3a-8add2c647ba"
+    },
+    "requestBody": {
+      "Password": "Ottop4y2024!",
+      "Username": "ottopay"
+    },
+    "responseHeaders": {
+      "X-Mock": "true"
+    },
+    "responseBody": {
+      "data": {
+        "id": "idm",
+        "id_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiaW5kb21hcmNvIiwiZXhwIjoxODQ2MjIxMTA4LCJpc3MiOiJJbmRvbWFyY28ifQ.iDRCVKNTaJwTNYo-jZqVsfaDdfWNlwUUgOPe_yNcwOk",
+        "username": "{{body.Username}}"
+      },
+      "meta": {
+        "code": 200,
+        "message": "Success",
+        "status": true
+      }
+    },
+    "statusCode": 200
+  },
+  {
+    "name": "inquiry",
+    "method": "POST",
+    "path": "/api/inquiry",
+    "requestHeaders": {
+      "Accept": "*/*",
+      "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiaW5kb21hcmNvIiwiZXhwIjoxODQ2MjIxMTA4LCJpc3MiOiJJbmRvbWFyY28ifQ.iDRCVKNTaJwTNYo-jZqVsfaDdfWNlwUUgOPe_yNcwOk",
+      "Content-Type": "application/json",
+      "X-Trace-Id": "1013435c-613e-11f0-bf3a-8add2c647b68"
+    },
+    "requestBody": {
+      "AdditionalData": "",
+      "ChannelType": "BCA",
+      "CompanyCode": "8481",
+      "CustomerNumber": "108720212451",
+      "RequestID": "292ae586-2773-4ef6-a479-d7214c6424d9",
+      "TransactionDate": "15/07/2025 12:39:23"
+    },
+    "responseHeaders": {
+      "X-Mock": "true"
+    },
+    "responseBody": {
+      "AdditionalData": "",
+      "CompanyCode": "{{body.CompanyCode}}",
+      "CurrencyCode": "IDR",
+      "CustomerName": "Gandhi Wibowo",
+      "CustomerNumber": "{{body.CustomerNumber}}",
+      "DetailBills": [],
+      "FreeText": [],
+      "InquiryReason": {
+        "english": "Success",
+        "indonesian": "Sukses"
+      },
+      "InquiryStatus": "00",
+      "RequestID": "{{body.RequestID}}",
+      "SubCompany": "00000",
+      "TotalAmount": "0.00"
+    },
+    "statusCode": 200
+  },
+  {
+    "name": "payment",
+    "method": "POST",
+    "path": "/api/payment",
+    "requestHeaders": {
+      "Accept": "*/*",
+      "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiaW5kb21hcmNvIiwiZXhwIjoxODQ2MjIxMTA4LCJpc3MiOiJJbmRvbWFyY28ifQ.iDRCVKNTaJwTNYo-jZqVsfaDdfWNlwUUgOPe_yNcwOk",
+      "Content-Type": "application/json",
+      "X-Trace-Id": "4f1f8fbd-613e-11f0-bf3a-8add2c647b68"
+    },
+    "requestBody": {
+      "AdditionalData": "{\"channel\":\"MB\",\"description\":\"\",\"deviceId\":\"BIFAST\",\"postingType\":\"POSTING\",\"receiverAccountNumber\":\"    8481229468763403\",\"receiverBankCode\":\"IAPTIDJA\",\"receiverName\":\"ABC247036709\",\"senderAccountNumber\":\"3831404203\",\"senderBankCode\":\"CENAIDJA\",\"senderName\":\"JULIO HENDRAWAN WIJAYA\",\"sourceAccountNo\":null,\"sourceBankName\":null}",
+      "ChannelType": "BCA",
+      "CompanyCode": "8481",
+      "CurrencyCode": "IDR",
+      "CustomerName": "",
+      "CustomerNumber": "229468763403",
+      "DetailBills": [
+        ""
+      ],
+      "FlagAdvice": "N",
+      "PaidAmount": "21000.00",
+      "Reference": "0dd79d51-6d76-4047-9e4a-e00c05a42643",
+      "RequestID": "0dd79d51-6d76-4047-9e4a-e00c05a42643",
+      "SubCompany": "00000",
+      "TotalAmount": "21000.00",
+      "TransactionDate": "15/07/2025 12:41:09"
+    },
+    "responseHeaders": {
+      "X-Mock": "true"
+    },
+    "responseBody": {
+      "AdditionalData": "",
+      "CompanyCode": "{{body.CompanyCode}}",
+      "CurrencyCode": "{{body.CurrencyCode}}",
+      "CustomerName": "{{body.CustomerName}}",
+      "CustomerNumber": "{{body.CustomerNumber}}",
+      "DetailBills": [],
+      "FreeTexts": [],
+      "PaidAmount": "{{body.PaidAmount}}",
+      "PaymentFlagReason": {
+        "english": "Success",
+        "indonesian": "Sukses"
+      },
+      "PaymentFlagStatus": "00",
+      "RequestID": "{{body.RequestID}}",
+      "TotalAmount": "{{body.TotalAmount}}",
+      "TransactionDate": "{{body.TransactionDate}}"
+    },
+    "statusCode": 200
+  },
+  {
+    "name": "Test",
+    "method": "GET",
+    "path": "/api/test",
+    "requestHeaders": {},
+    "requestBody": {},
+    "responseHeaders": {},
+    "responseBody": {
+      "data": true
+    },
+    "statusCode": 200
+  }
+]

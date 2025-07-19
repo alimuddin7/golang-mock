@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mock API Editor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50 text-gray-800">
+    <div class="max-w-5xl mx-auto p-6">
+        <h1 class="text-2xl font-bold mb-4">Mock API Configuration</h1>
+
+        <form id="configForm" onsubmit="submitForm(event)">
+            <div id="configContainer" class="space-y-4">
+                {{ range $i, $cfg := .Configs }}
+                <div class="border rounded-lg shadow-sm bg-white" x-data="{ open: false, tab: 'info' }">
+                    <div class="flex items-center justify-between px-4 py-2 bg-gray-100 cursor-pointer"
+                        @click="open = !open">
+                        <div>
+                            <strong>{{ $cfg.Name }}</strong> <span class="text-sm text-gray-500">({{ $cfg.Method }} {{
+                                $cfg.Path }})</span>
+                            <button onclick="deleteConfig({{ $i }})" class="text-red-600 text-sm">Hapus</button>
+                        </div>
+                        <div>
+                            <svg :class="{ 'rotate-180': open }" class="w-5 h-5 transform transition-transform"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div x-show="open" class="p-4 border-t">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium">Name</label>
+                            <input type="text" name="configs[{{ $i }}].name" value="{{ $cfg.Name }}"
+                                class="mt-1 w-full border rounded p-2" />
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-sm font-medium">Method</label>
+                                <input type="text" name="configs[{{ $i }}].method" value="{{ $cfg.Method }}"
+                                    class="mt-1 w-full border rounded p-2" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium">Path</label>
+                                <input type="text" name="configs[{{ $i }}].path" value="{{ $cfg.Path }}"
+                                    class="mt-1 w-full border rounded p-2" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium">Status Code</label>
+                                <input type="number" name="configs[{{ $i }}].statusCode" value="{{ $cfg.StatusCode }}"
+                                    class="mt-1 w-full border rounded p-2" />
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex space-x-2 mb-2">
+                                <button type="button" @click="tab = 'requestHeaders'"
+                                    :class="{ 'bg-blue-500 text-white': tab === 'requestHeaders' }"
+                                    class="px-3 py-1 rounded border">Request Headers</button>
+                                <button type="button" @click="tab = 'requestBody'"
+                                    :class="{ 'bg-blue-500 text-white': tab === 'requestBody' }"
+                                    class="px-3 py-1 rounded border">Request Body</button>
+                                <button type="button" @click="tab = 'responseHeaders'"
+                                    :class="{ 'bg-blue-500 text-white': tab === 'responseHeaders' }"
+                                    class="px-3 py-1 rounded border">Response Headers</button>
+                                <button type="button" @click="tab = 'responseBody'"
+                                    :class="{ 'bg-blue-500 text-white': tab === 'responseBody' }"
+                                    class="px-3 py-1 rounded border">Response Body</button>
+                            </div>
+
+                            <div x-show="tab === 'requestHeaders'" class="mt-2">
+                                <label for="requestHeaders-{{ $i }}" class="font-semibold">Request Headers (JSON)</label>
+                                <textarea id="requestHeaders-{{ $i }}" name="configs[{{ $i }}].requestHeaders" rows="5"
+                                    class="w-full border rounded p-2">{{ toJsonPretty $cfg.RequestHeaders }}</textarea>
+                                <button type="button" class="text-blue-500 text-xs mt-1" onclick="beautifyJSON('requestHeaders-{{ $i }}')">Beautify JSON</button>
+                            </div>
+
+                            <div x-show="tab === 'requestBody'" class="mt-2">
+                                <label for="requestBody-{{ $i }}" class="font-semibold">Request Body (JSON)</label>
+                                <textarea id="requestBody-{{ $i }}" name="configs[{{ $i }}].requestBody" rows="5"
+                                    class="w-full border rounded p-2">{{ toJsonPretty $cfg.RequestBody }}</textarea>
+                                <button type="button" class="text-blue-500 text-xs mt-1" onclick="beautifyJSON('requestBody-{{ $i }}')">Beautify JSON</button>  
+                            </div>
+
+                            <div x-show="tab === 'responseHeaders'" class="mt-2">
+                                <label for="responseHeaders-{{ $i }}" class="font-semibold">Response Headers (JSON)</label>
+                                <textarea id="responseHeaders-{{ $i }}" name="configs[{{ $i }}].responseHeaders" rows="5"
+                                    class="w-full border rounded p-2">{{ toJsonPretty $cfg.ResponseHeaders }}</textarea>
+                                <button type="button" class="text-blue-500 text-xs mt-1" onclick="beautifyJSON('responseHeaders-{{ $i }}')">Beautify JSON</button>
+                            </div>
+
+                            <div x-show="tab === 'responseBody'" class="mt-2">
+                                <label for="responseBody-{{ $i }}" class="font-semibold">Response Body (JSON)</label>
+                                <textarea id="responseBody-{{ $i }}" name="configs[{{ $i }}].responseBody" rows="5"
+                                    class="w-full border rounded p-2">{{ toJsonPretty $cfg.ResponseBody }}</textarea>
+                                <button type="button" class="text-blue-500 text-xs mt-1" onclick="beautifyJSON('responseBody-{{ $i }}')">Beautify JSON</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {{ end }}
+            </div>
+
+            <div class="mt-6 flex justify-between">
+                <button type="button" onclick="addConfig()"
+                    class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
+                    Add Config
+                </button>
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded">
+                    Save All
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://unpkg.com/alpinejs" defer></script>
+    <script>
+        let dynamicIndex = {{ len .Configs }};
+
+        function addConfig() {
+            const container = document.getElementById('configContainer');
+            const idx = dynamicIndex++;
+
+            const html = `
+        <div class="border rounded-lg shadow-sm bg-white" x-data="{ open: true, tab: 'info' }">
+          <div class="flex items-center justify-between px-4 py-2 bg-gray-100 cursor-pointer" @click="open = !open">
+            <div>
+              <strong>New Config</strong>
+            </div>
+            <div>
+              <svg :class="{ 'rotate-180': open }" class="w-5 h-5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </div>
+          </div>
+          <div x-show="open" class="p-4 border-t">
+            <div class="mb-4">
+              <label class="block text-sm font-medium">Name</label>
+              <input type="text" name="configs[${idx}].name" class="mt-1 w-full border rounded p-2" />
+            </div>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+              <div>
+                <label class="block text-sm font-medium">Method</label>
+                <input type="text" name="configs[${idx}].method" class="mt-1 w-full border rounded p-2" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium">Path</label>
+                <input type="text" name="configs[${idx}].path" class="mt-1 w-full border rounded p-2" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium">Status Code</label>
+                <input type="number" name="configs[${idx}].statusCode" value="200" class="mt-1 w-full border rounded p-2" />
+              </div>
+            </div>
+
+            <div class="flex space-x-2 mb-2">
+              <button type="button" @click="tab = 'requestHeaders'" :class="{ 'bg-blue-500 text-white': tab === 'requestHeaders' }" class="px-3 py-1 rounded border">Request Headers</button>
+              <button type="button" @click="tab = 'requestBody'" :class="{ 'bg-blue-500 text-white': tab === 'requestBody' }" class="px-3 py-1 rounded border">Request Body</button>
+              <button type="button" @click="tab = 'responseHeaders'" :class="{ 'bg-blue-500 text-white': tab === 'responseHeaders' }" class="px-3 py-1 rounded border">Response Headers</button>
+              <button type="button" @click="tab = 'responseBody'" :class="{ 'bg-blue-500 text-white': tab === 'responseBody' }" class="px-3 py-1 rounded border">Response Body</button>
+            </div>
+
+            <div x-show="tab === 'requestHeaders'" class="mt-2">
+              <label for="requestHeaders-${idx}" class="font-semibold">Request Headers (JSON)</label>
+              <textarea id="requestHeaders-${idx}" name="configs[${idx}].requestHeaders" rows="5" class="w-full border rounded p-2">{}</textarea>
+              <button type="button" class="text-blue-500 text-xs mt-1" onclick="beautifyJSON('requestHeaders-${idx}')">Beautify JSON</button>
+            </div>
+
+            <div x-show="tab === 'requestBody'" class="mt-2">
+              <label for="requestBody-${idx}" class="font-semibold">Request Body (JSON)</label>
+              <textarea id="requestBody-${idx}" name="configs[${idx}].requestBody" rows="5" class="w-full border rounded p-2">{}</textarea>
+              <button type="button" class="text-blue-500 text-xs mt-1" onclick="beautifyJSON('requestBody-${idx}')">Beautify JSON</button>
+            </div>
+
+            <div x-show="tab === 'responseHeaders'" class="mt-2">
+              <label for="responseHeaders-${idx}" class="font-semibold">Response Headers (JSON)</label>
+              <textarea id="responseHeaders-${idx}" name="configs[${idx}].responseHeaders" rows="5" class="w-full border rounded p-2">{}</textarea>
+              <button type="button" class="text-blue-500 text-xs mt-1" onclick="beautifyJSON('responseHeaders-${idx}')">Beautify JSON</button>
+            </div>
+
+            <div x-show="tab === 'responseBody'" class="mt-2">
+              <label for="responseBody-${idx}" class="font-semibold">Response Body (JSON)</label>
+              <textarea id="responseBody-${idx}" name="configs[${idx}].responseBody" rows="5" class="w-full border rounded p-2">{}</textarea>
+              <button type="button" class="text-blue-500 text-xs mt-1" onclick="beautifyJSON('responseBody-${idx}')">Beautify JSON</button>
+            </div>
+          </div>
+        </div>
+      `;
+
+            container.insertAdjacentHTML('beforeend', html);
+        }
+
+        async function submitForm(e) {
+            e.preventDefault();
+
+            const formData = new FormData(document.getElementById('configForm'));
+            const entries = Object.fromEntries(formData.entries());
+
+            const configMap = {};
+
+            for (const [key, val] of Object.entries(entries)) {
+                const match = key.match(/configs\[(\d+)\]\.(\w+)/);
+                if (!match) continue;
+
+                const index = parseInt(match[1]);
+                const field = match[2];
+
+                configMap[index] = configMap[index] || {
+                    name: "",
+                    method: "",
+                    path: "",
+                    statusCode: 200,
+                    requestHeaders: {},
+                    requestBody: {},
+                    responseHeaders: {},
+                    responseBody: {}
+                };
+
+                if (["requestHeaders", "requestBody", "responseHeaders", "responseBody"].includes(field)) {
+                    try {
+                        configMap[index][field] = JSON.parse(val || "{}");
+                    } catch (err) {
+                        alert(`Invalid JSON in field "${field}" of config #${index + 1}`);
+                        return;
+                    }
+                } else if (field === "statusCode") {
+                    configMap[index][field] = parseInt(val);
+                } else {
+                    configMap[index][field] = val;
+                }
+            }
+
+            const configs = Object.values(configMap);
+
+            const res = await fetch("/save", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(configs)
+            });
+
+            const msg = await res.text();
+            alert(msg);
+            location.reload(); // auto reload
+        }
+
+        async function deleteConfig(index) {
+            if (!confirm("Hapus config ini?")) return;
+
+            const res = await fetch(`/delete-config/${index}`, {
+                method: "POST"
+            });
+
+            if (res.ok) {
+                location.reload();
+            } else {
+                const msg = await res.text();
+                alert("Gagal: " + msg);
+            }
+        }
+        function beautifyJSON(id) {
+            const textarea = document.getElementById(id);
+            try {
+                const parsed = JSON.parse(textarea.value);
+                const pretty = JSON.stringify(parsed, null, 2);
+                textarea.value = pretty;
+            } catch (e) {
+                alert("Invalid JSON format");
+            }
+        }
+    </script>
+</body>
+
+</html>
