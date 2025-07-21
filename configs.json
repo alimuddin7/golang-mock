@@ -10,8 +10,8 @@
       "X-Trace-Id": "f48518a8-613d-11f0-bf3a-8add2c647ba"
     },
     "requestBody": {
-      "Password": "Ottop4y2024!",
-      "Username": "ottopay"
+      "Password": "***",
+      "Username": "admin"
     },
     "responseHeaders": {
       "X-Mock": "true"
@@ -122,14 +122,15 @@
     "statusCode": 200
   },
   {
-    "name": "Test",
+    "name": "test param",
     "method": "GET",
-    "path": "/api/test",
+    "path": "/api/ok",
     "requestHeaders": {},
     "requestBody": {},
     "responseHeaders": {},
     "responseBody": {
-      "data": true
+      "param1": "{{query.a}}",
+      "param2": "{{query.b}}"
     },
     "statusCode": 200
   }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -21,8 +22,6 @@ type MockConfig struct {
 	ResponseBody    map[string]interface{} `json:"responseBody"`
 	StatusCode      int                    `json:"statusCode"`
 }
-
-var dynamicGroup fiber.Router
 
 var configs []MockConfig
 
@@ -50,41 +49,85 @@ func toJsonPretty(v interface{}) string {
 	return string(b)
 }
 
-func setupDynamicRoutes(group fiber.Router) {
-	for _, cfg := range configs {
-		route := cfg // prevent closure bug
-		group.Add(strings.ToUpper(route.Method), route.Path, func(c *fiber.Ctx) error {
-			// Header validation
-			for key, val := range route.RequestHeaders {
-				if c.Get(key) != val {
-					return c.Status(fiber.StatusBadRequest).SendString("Invalid header")
-				}
-			}
-
-			// Body validation
-			if len(route.RequestBody) > 0 {
-				var body map[string]interface{}
-				if err := c.BodyParser(&body); err != nil {
-					return c.Status(fiber.StatusBadRequest).SendString("Invalid body")
-				}
-			}
-
-			// Set response headers
-			for key, val := range route.ResponseHeaders {
-				c.Set(key, val)
-			}
-
-			return c.Status(route.StatusCode).JSON(route.ResponseBody)
-		})
+func renderTemplateRecursive(data interface{}, bodyMap, headerMap, queryMap map[string]string) interface{} {
+	switch v := data.(type) {
+	case string:
+		// replace {{key}} placeholders
+		for k, val := range bodyMap {
+			v = strings.ReplaceAll(v, "{{body."+k+"}}", val)
+		}
+		for k, val := range headerMap {
+			v = strings.ReplaceAll(v, "{{header."+k+"}}", val)
+		}
+		for k, val := range queryMap {
+			v = strings.ReplaceAll(v, "{{query."+k+"}}", val)
+		}
+		return v
+	case map[string]interface{}:
+		result := map[string]interface{}{}
+		for key, val := range v {
+			result[key] = renderTemplateRecursive(val, bodyMap, headerMap, queryMap)
+		}
+		return result
+	case []interface{}:
+		for i, val := range v {
+			v[i] = renderTemplateRecursive(val, bodyMap, headerMap, queryMap)
+		}
 	}
+	return data
 }
 
-func saveConfigToFile(configs []MockConfig) error {
-	b, err := json.MarshalIndent(configs, "", "  ")
-	if err != nil {
-		return err
+func dynamicRouteHandler(c *fiber.Ctx) error {
+	method := c.Method()
+	path := c.Path()
+
+	for _, cfg := range configs {
+		if strings.EqualFold(cfg.Method, method) && cfg.Path == path {
+			// Validate headers
+			headerMap := map[string]string{}
+			for key := range cfg.RequestHeaders {
+				headerMap[key] = c.Get(key)
+				if c.Get(key) == "" {
+					return c.Status(400).JSON(fiber.Map{
+						"error": "missing required header: " + key,
+					})
+				}
+			}
+
+			bodyMap := map[string]interface{}{}
+			bodyStrMap := map[string]string{}
+			if cfg.RequestBody != nil && (c.Method() == "POST" || c.Method() == "PUT") {
+				if err := c.BodyParser(&bodyMap); err != nil {
+					return c.Status(400).JSON(fiber.Map{"error": "invalid request body"})
+				}
+				for key := range cfg.RequestBody {
+					if _, ok := bodyMap[key]; !ok {
+						return c.Status(400).JSON(fiber.Map{
+							"error": "missing required body field: " + key,
+						})
+					}
+				}
+				for k, v := range bodyMap {
+					bodyStrMap[k] = fmt.Sprintf("%v", v)
+				}
+			}
+
+			queryMap := make(map[string]string)
+			c.Request().URI().QueryArgs().VisitAll(func(k, v []byte) {
+				queryMap[string(k)] = string(v)
+			})
+
+			rendered := renderTemplateRecursive(cfg.ResponseBody, bodyStrMap, headerMap, queryMap)
+
+			for k, v := range cfg.ResponseHeaders {
+				c.Set(k, v)
+			}
+
+			return c.Status(cfg.StatusCode).JSON(rendered)
+		}
 	}
-	return os.WriteFile("configs.json", b, 0644)
+
+	return c.Status(fiber.StatusNotFound).SendString("Mock not found")
 }
 
 func main() {
@@ -110,53 +153,36 @@ func main() {
 	app.Post("/save", func(c *fiber.Ctx) error {
 		var newConfigs []MockConfig
 		if err := c.BodyParser(&newConfigs); err != nil {
-			return c.Status(400).SendString("Invalid config format")
+			return c.Status(fiber.StatusBadRequest).SendString("Invalid config format")
 		}
 
 		if err := saveConfigs(newConfigs); err != nil {
-			return c.Status(500).SendString("Failed to write config")
+			return c.Status(fiber.StatusInternalServerError).SendString("Failed to write config")
 		}
 
 		configs = newConfigs
-		dynamicGroup = app.Group("/_mock") // re-init group to remove old handlers
-		setupDynamicRoutes(dynamicGroup)
 		return c.SendString("Config saved successfully!")
 	})
 
 	app.Post("/delete-config/:index", func(c *fiber.Ctx) error {
 		indexStr := c.Params("index")
 		index, err := strconv.Atoi(indexStr)
-		if err != nil {
-			return c.Status(400).SendString("Invalid index")
+		if err != nil || index < 0 || index >= len(configs) {
+			return c.Status(fiber.StatusBadRequest).SendString("Invalid index")
 		}
 
-		// configs, err := loadConfigs()
-		// if err != nil {
-		// 	return c.Status(500).SendString("Gagal membaca konfigurasi")
-		// }
-
-		if index < 0 || index >= len(configs) {
-			return c.Status(400).SendString("Index out of range")
-		}
-
-		// ❌ Ini salah jika kamu tidak menyimpan array baru
-		// configs = append(configs[:index], configs[index+1:]...)
-
-		// ✅ Ini benar
 		newConfigs := append(configs[:index], configs[index+1:]...)
 
-		// Simpan ulang
 		if err := saveConfigs(newConfigs); err != nil {
-			return c.Status(500).SendString("Gagal menyimpan konfigurasi")
+			return c.Status(fiber.StatusInternalServerError).SendString("Failed to save configs")
 		}
-		dynamicGroup = app.Group("/_mock") // re-init group to remove old handlers
-		setupDynamicRoutes(dynamicGroup)
 
+		configs = newConfigs
 		return c.Redirect("/")
 	})
 
-	dynamicGroup = app.Group("/_mock")
-	setupDynamicRoutes(dynamicGroup)
+	// Register universal catch-all route AFTER all others
+	app.All("/*", dynamicRouteHandler)
 
 	log.Fatal(app.Listen(":3000"))
 }

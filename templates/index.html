@@ -9,9 +9,29 @@
 </head>
 
 <body class="bg-gray-50 text-gray-800">
-    <div class="max-w-5xl mx-auto p-6">
-        <h1 class="text-2xl font-bold mb-4">Mock API Configuration</h1>
+    <div class="bg-gradient-to-r from-blue-700 to-blue-500 text-white px-6 py-4 rounded-b-xl shadow-md">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl font-semibold">🛠️ Mock API Editor</h1>
+                <p class="text-sm text-blue-100 mt-1">Edit and manage your mock API configurations.</p>
+            </div>
+            <span class="text-xs bg-blue-900 px-2 py-1 rounded-full">Version: 1.0.0</span>
+        </div>
 
+        <div class="mt-4 bg-blue-600/40 p-4 rounded-md">
+            <p class="text-sm font-medium mb-2">🧠 Dynamic Field Binding:</p>
+            <ul class="list-disc list-inside text-sm space-y-1">
+                <li><code class="bg-blue-900 px-2 py-1 rounded text-white">{{ "{{body.fieldOfRequest}}" }}</code> –
+                    capture value from request body</li>
+                <li><code class="bg-blue-900 px-2 py-1 rounded text-white">{{ "{{header.fieldOfRequest}}" }}</code> –
+                    capture value from request headers</li>
+                <li><code class="bg-blue-900 px-2 py-1 rounded text-white">{{ "{{query.fieldOfRequest}}" }}</code> –
+                    capture value from query parameters</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="max-w-5xl mx-auto p-6">
         <form id="configForm" onsubmit="submitForm(event)">
             <div id="configContainer" class="space-y-4">
                 {{ range $i, $cfg := .Configs }}
@@ -21,7 +41,8 @@
                         <div>
                             <strong>{{ $cfg.Name }}</strong> <span class="text-sm text-gray-500">({{ $cfg.Method }} {{
                                 $cfg.Path }})</span>
-                            <button onclick="deleteConfig({{ $i }})" class="text-red-600 text-sm">Hapus</button>
+                            <button type="button" onclick="deleteConfig({{ $i }}, event)"
+                                class="text-red-500 hover:text-red-700">🗑 Hapus</button>
                         </div>
                         <div>
                             <svg :class="{ 'rotate-180': open }" class="w-5 h-5 transform transition-transform"
@@ -35,23 +56,23 @@
                         <div class="mb-4">
                             <label class="block text-sm font-medium">Name</label>
                             <input type="text" name="configs[{{ $i }}].name" value="{{ $cfg.Name }}"
-                                class="mt-1 w-full border rounded p-2" />
+                                class="mt-1 w-full border rounded p-2" required />
                         </div>
                         <div class="grid grid-cols-2 gap-4 mb-4">
                             <div>
                                 <label class="block text-sm font-medium">Method</label>
                                 <input type="text" name="configs[{{ $i }}].method" value="{{ $cfg.Method }}"
-                                    class="mt-1 w-full border rounded p-2" />
+                                    class="mt-1 w-full border rounded p-2" required />
                             </div>
                             <div>
                                 <label class="block text-sm font-medium">Path</label>
                                 <input type="text" name="configs[{{ $i }}].path" value="{{ $cfg.Path }}"
-                                    class="mt-1 w-full border rounded p-2" />
+                                    class="mt-1 w-full border rounded p-2" required />
                             </div>
                             <div>
                                 <label class="block text-sm font-medium">Status Code</label>
                                 <input type="number" name="configs[{{ $i }}].statusCode" value="{{ $cfg.StatusCode }}"
-                                    class="mt-1 w-full border rounded p-2" />
+                                    class="mt-1 w-full border rounded p-2" required />
                             </div>
                         </div>
 
@@ -72,31 +93,38 @@
                             </div>
 
                             <div x-show="tab === 'requestHeaders'" class="mt-2">
-                                <label for="requestHeaders-{{ $i }}" class="font-semibold">Request Headers (JSON)</label>
+                                <label for="requestHeaders-{{ $i }}" class="font-semibold">Request Headers
+                                    (JSON)</label>
                                 <textarea id="requestHeaders-{{ $i }}" name="configs[{{ $i }}].requestHeaders" rows="5"
                                     class="w-full border rounded p-2">{{ toJsonPretty $cfg.RequestHeaders }}</textarea>
-                                <button type="button" class="text-blue-500 text-xs mt-1" onclick="beautifyJSON('requestHeaders-{{ $i }}')">Beautify JSON</button>
+                                <button type="button" class="text-blue-500 text-xs mt-1"
+                                    onclick="beautifyJSON('requestHeaders-{{ $i }}')">Beautify JSON</button>
                             </div>
 
                             <div x-show="tab === 'requestBody'" class="mt-2">
                                 <label for="requestBody-{{ $i }}" class="font-semibold">Request Body (JSON)</label>
                                 <textarea id="requestBody-{{ $i }}" name="configs[{{ $i }}].requestBody" rows="5"
                                     class="w-full border rounded p-2">{{ toJsonPretty $cfg.RequestBody }}</textarea>
-                                <button type="button" class="text-blue-500 text-xs mt-1" onclick="beautifyJSON('requestBody-{{ $i }}')">Beautify JSON</button>  
+                                <button type="button" class="text-blue-500 text-xs mt-1"
+                                    onclick="beautifyJSON('requestBody-{{ $i }}')">Beautify JSON</button>
                             </div>
 
                             <div x-show="tab === 'responseHeaders'" class="mt-2">
-                                <label for="responseHeaders-{{ $i }}" class="font-semibold">Response Headers (JSON)</label>
-                                <textarea id="responseHeaders-{{ $i }}" name="configs[{{ $i }}].responseHeaders" rows="5"
+                                <label for="responseHeaders-{{ $i }}" class="font-semibold">Response Headers
+                                    (JSON)</label>
+                                <textarea id="responseHeaders-{{ $i }}" name="configs[{{ $i }}].responseHeaders"
+                                    rows="5"
                                     class="w-full border rounded p-2">{{ toJsonPretty $cfg.ResponseHeaders }}</textarea>
-                                <button type="button" class="text-blue-500 text-xs mt-1" onclick="beautifyJSON('responseHeaders-{{ $i }}')">Beautify JSON</button>
+                                <button type="button" class="text-blue-500 text-xs mt-1"
+                                    onclick="beautifyJSON('responseHeaders-{{ $i }}')">Beautify JSON</button>
                             </div>
 
                             <div x-show="tab === 'responseBody'" class="mt-2">
                                 <label for="responseBody-{{ $i }}" class="font-semibold">Response Body (JSON)</label>
                                 <textarea id="responseBody-{{ $i }}" name="configs[{{ $i }}].responseBody" rows="5"
                                     class="w-full border rounded p-2">{{ toJsonPretty $cfg.ResponseBody }}</textarea>
-                                <button type="button" class="text-blue-500 text-xs mt-1" onclick="beautifyJSON('responseBody-{{ $i }}')">Beautify JSON</button>
+                                <button type="button" class="text-blue-500 text-xs mt-1"
+                                    onclick="beautifyJSON('responseBody-{{ $i }}')">Beautify JSON</button>
                             </div>
                         </div>
                     </div>
@@ -115,7 +143,6 @@
             </div>
         </form>
     </div>
-
     <script src="https://unpkg.com/alpinejs" defer></script>
     <script>
         let dynamicIndex = {{ len .Configs }};
@@ -139,20 +166,20 @@
           <div x-show="open" class="p-4 border-t">
             <div class="mb-4">
               <label class="block text-sm font-medium">Name</label>
-              <input type="text" name="configs[${idx}].name" class="mt-1 w-full border rounded p-2" />
+              <input type="text" name="configs[${idx}].name" class="mt-1 w-full border rounded p-2" required/>
             </div>
             <div class="grid grid-cols-2 gap-4 mb-4">
               <div>
                 <label class="block text-sm font-medium">Method</label>
-                <input type="text" name="configs[${idx}].method" class="mt-1 w-full border rounded p-2" />
+                <input type="text" name="configs[${idx}].method" class="mt-1 w-full border rounded p-2" required/>
               </div>
               <div>
                 <label class="block text-sm font-medium">Path</label>
-                <input type="text" name="configs[${idx}].path" class="mt-1 w-full border rounded p-2" />
+                <input type="text" name="configs[${idx}].path" class="mt-1 w-full border rounded p-2" required/>
               </div>
               <div>
                 <label class="block text-sm font-medium">Status Code</label>
-                <input type="number" name="configs[${idx}].statusCode" value="200" class="mt-1 w-full border rounded p-2" />
+                <input type="number" name="configs[${idx}].statusCode" value="200" class="mt-1 w-full border rounded p-2" required/>
               </div>
             </div>
 
@@ -246,18 +273,19 @@
             location.reload(); // auto reload
         }
 
-        async function deleteConfig(index) {
-            if (!confirm("Hapus config ini?")) return;
+        function deleteConfig(index, event) {
+            if (event) event.preventDefault();
 
-            const res = await fetch(`/delete-config/${index}`, {
-                method: "POST"
-            });
-
-            if (res.ok) {
-                location.reload();
-            } else {
-                const msg = await res.text();
-                alert("Gagal: " + msg);
+            if (confirm("Yakin ingin menghapus config ini?")) {
+                fetch(`/delete-config/${index}`, {
+                    method: "POST",
+                }).then((res) => {
+                    if (res.ok) {
+                        location.reload();
+                    } else {
+                        alert("Gagal menghapus config");
+                    }
+                });
             }
         }
         function beautifyJSON(id) {
