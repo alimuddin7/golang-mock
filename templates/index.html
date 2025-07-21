@@ -9,25 +9,46 @@
 </head>
 
 <body class="bg-gray-50 text-gray-800">
-    <div class="bg-gradient-to-r from-blue-700 to-blue-500 text-white px-6 py-4 rounded-b-xl shadow-md">
-        <div class="flex items-center justify-between">
-            <div>
-                <h1 class="text-2xl font-semibold">🛠️ Mock API Editor</h1>
-                <p class="text-sm text-blue-100 mt-1">Edit and manage your mock API configurations.</p>
-            </div>
-            <span class="text-xs bg-blue-900 px-2 py-1 rounded-full">Version: 1.0.0</span>
-        </div>
+    <div class="bg-blue-700 text-white p-6 rounded shadow">
+        <h1 class="text-2xl font-bold mb-1">Mock API Editor</h1>
+        <p class="text-sm mb-2">Edit and manage your mock API configurations easily and flexibly.</p>
+        <p class="text-xs text-blue-200 mb-4">Version: 1.0.0</p>
 
-        <div class="mt-4 bg-blue-600/40 p-4 rounded-md">
-            <p class="text-sm font-medium mb-2">🧠 Dynamic Field Binding:</p>
-            <ul class="list-disc list-inside text-sm space-y-1">
-                <li><code class="bg-blue-900 px-2 py-1 rounded text-white">{{ "{{body.fieldOfRequest}}" }}</code> –
-                    capture value from request body</li>
-                <li><code class="bg-blue-900 px-2 py-1 rounded text-white">{{ "{{header.fieldOfRequest}}" }}</code> –
-                    capture value from request headers</li>
-                <li><code class="bg-blue-900 px-2 py-1 rounded text-white">{{ "{{query.fieldOfRequest}}" }}</code> –
-                    capture value from query parameters</li>
-            </ul>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Dynamic Field Usage -->
+            <div class="bg-blue-800 p-4 rounded">
+                <h2 class="text-sm font-semibold mb-2">Dynamic Field Usage</h2>
+                <ul class="list-disc list-inside text-sm space-y-1">
+                    <li>
+                        <code class="bg-blue-900 px-2 py-1 rounded text-white">{{ "{{body.fieldOfRequest}}" }}</code> –
+                        capture value from request body
+                    </li>
+                    <li>
+                        <code class="bg-blue-900 px-2 py-1 rounded text-white">{{ "{{header.fieldOfRequest}}" }}</code>
+                        –
+                        capture value from request headers
+                    </li>
+                    <li>
+                        <code class="bg-blue-900 px-2 py-1 rounded text-white">{{ "{{query.fieldOfRequest}}" }}</code> –
+                        capture value from query parameters
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Validation Note -->
+            <div class="bg-yellow-600 p-4 rounded">
+                <h2 class="text-sm font-semibold mb-2">Validation Note</h2>
+                <p class="text-sm">
+                    All fields defined under
+                    <code class="bg-yellow-800 px-2 py-1 rounded text-white">requestHeaders</code> and
+                    <code class="bg-yellow-800 px-2 py-1 rounded text-white">requestBody</code>
+                    are <strong>required</strong> by default.
+                </p>
+                <p class="text-sm mt-2">
+                    If any required field is missing or mismatched, the server will respond with
+                    <span class="font-semibold">400 Bad Request</span>.
+                </p>
+            </div>
         </div>
     </div>
 
