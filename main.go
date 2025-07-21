@@ -12,6 +12,7 @@ import (
 	"github.com/gofiber/template/html/v2"
 )
 
+// MockConfig ...
 type MockConfig struct {
 	Name            string                 `json:"name"`
 	Method          string                 `json:"method"`
