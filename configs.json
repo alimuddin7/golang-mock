@@ -120,18 +120,5 @@
       "TransactionDate": "{{body.TransactionDate}}"
     },
     "statusCode": 200
-  },
-  {
-    "name": "test param",
-    "method": "GET",
-    "path": "/api/ok",
-    "requestHeaders": {},
-    "requestBody": {},
-    "responseHeaders": {},
-    "responseBody": {
-      "param1": "{{query.a}}",
-      "param2": "{{query.b}}"
-    },
-    "statusCode": 200
   }
 ]
