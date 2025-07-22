@@ -48,6 +48,9 @@
                     If any required field is missing or mismatched, the server will respond with
                     <span class="font-semibold">400 Bad Request</span>.
                 </p>
+                <p class="text-sm">
+                    Parameters timeout in milliseconds, if set to 0, will not apply any delay.
+                </p>
             </div>
         </div>
     </div>
@@ -94,6 +97,11 @@
                                 <label class="block text-sm font-medium">Status Code</label>
                                 <input type="number" name="configs[{{ $i }}].statusCode" value="{{ $cfg.StatusCode }}"
                                     class="mt-1 w-full border rounded p-2" required />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium">Timeout</label>
+                                <input type="number" name="configs[{{ $i }}].timeout" value="{{ $cfg.Timeout }}"
+                                    class="mt-1 w-full border rounded p-2"/>
                             </div>
                         </div>
 
@@ -202,6 +210,10 @@
                 <label class="block text-sm font-medium">Status Code</label>
                 <input type="number" name="configs[${idx}].statusCode" value="200" class="mt-1 w-full border rounded p-2" required/>
               </div>
+              <div>
+                <label class="block text-sm font-medium">Timeout</label>
+                <input type="number" name="configs[${idx}].timeout" value="0" class="mt-1 w-full border rounded p-2"/>
+              </div>
             </div>
 
             <div class="flex space-x-2 mb-2">
@@ -261,6 +273,7 @@
                     method: "",
                     path: "",
                     statusCode: 200,
+                    timeout: 0,
                     requestHeaders: {},
                     requestBody: {},
                     responseHeaders: {},
@@ -275,6 +288,8 @@
                         return;
                     }
                 } else if (field === "statusCode") {
+                    configMap[index][field] = parseInt(val);
+                } else if (field === "timeout") {
                     configMap[index][field] = parseInt(val);
                 } else {
                     configMap[index][field] = val;

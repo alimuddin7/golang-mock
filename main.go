@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/template/html/v2"
@@ -22,6 +23,7 @@ type MockConfig struct {
 	ResponseHeaders map[string]string      `json:"responseHeaders"`
 	ResponseBody    map[string]interface{} `json:"responseBody"`
 	StatusCode      int                    `json:"statusCode"`
+	Timeout         int                    `json:"timeout"` // Timeout in miliseconds
 }
 
 var configs []MockConfig
@@ -85,6 +87,12 @@ func dynamicRouteHandler(c *fiber.Ctx) error {
 	for _, cfg := range configs {
 		if strings.EqualFold(cfg.Method, method) && cfg.Path == path {
 			// Validate headers
+
+			if cfg.StatusCode == 500 {
+				return c.Status(500).JSON(fiber.Map{
+					"error": "Internal Server Error",
+				})
+			}
 			headerMap := map[string]string{}
 			for key := range cfg.RequestHeaders {
 				headerMap[key] = c.Get(key)
@@ -122,6 +130,9 @@ func dynamicRouteHandler(c *fiber.Ctx) error {
 
 			for k, v := range cfg.ResponseHeaders {
 				c.Set(k, v)
+			}
+			if cfg.Timeout > 0 {
+				time.Sleep(time.Duration(cfg.Timeout) * time.Millisecond)
 			}
 
 			return c.Status(cfg.StatusCode).JSON(rendered)

@@ -28,7 +28,8 @@
         "status": true
       }
     },
-    "statusCode": 200
+    "statusCode": 200,
+    "timeout": 6000
   },
   {
     "name": "inquiry",
@@ -68,7 +69,8 @@
       "SubCompany": "00000",
       "TotalAmount": "0.00"
     },
-    "statusCode": 200
+    "statusCode": 200,
+    "timeout": 0
   },
   {
     "name": "payment",
@@ -119,6 +121,7 @@
       "TotalAmount": "{{body.TotalAmount}}",
       "TransactionDate": "{{body.TransactionDate}}"
     },
-    "statusCode": 200
+    "statusCode": 200,
+    "timeout": 10
   }
 ]
