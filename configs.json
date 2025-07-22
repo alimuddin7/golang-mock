@@ -123,5 +123,16 @@
     },
     "statusCode": 200,
     "timeout": 10
+  },
+  {
+    "name": "test",
+    "method": "POST",
+    "path": "/api/test",
+    "requestHeaders": {},
+    "requestBody": {},
+    "responseHeaders": {},
+    "responseBody": {},
+    "statusCode": 200,
+    "timeout": 2000
   }
 ]
