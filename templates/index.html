@@ -84,9 +84,12 @@
                         </div>
                         <div class="grid grid-cols-2 gap-4 mb-4">
                             <div>
-                                <label class="block text-sm font-medium">Method</label>
-                                <input type="text" name="configs[{{ $i }}].method" value="{{ $cfg.Method }}"
-                                    class="mt-1 w-full border rounded p-2" required />
+                                <label class="block text-sm font-medium mb-1">Method</label>
+                                <select name="configs[{{ $i }}].method" class="w-full border rounded p-2" required>
+                                    {{ range httpMethods }}
+                                    <option value="{{ . }}" {{ if eq $cfg.Method . }}selected{{ end }}>{{ . }}</option>
+                                    {{ end }}
+                                </select>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium">Path</label>
@@ -101,7 +104,7 @@
                             <div>
                                 <label class="block text-sm font-medium">Timeout</label>
                                 <input type="number" name="configs[{{ $i }}].timeout" value="{{ $cfg.Timeout }}"
-                                    class="mt-1 w-full border rounded p-2"/>
+                                    class="mt-1 w-full border rounded p-2" />
                             </div>
                         </div>
 
@@ -198,11 +201,15 @@
               <input type="text" name="configs[${idx}].name" class="mt-1 w-full border rounded p-2" required/>
             </div>
             <div class="grid grid-cols-2 gap-4 mb-4">
-              <div>
-                <label class="block text-sm font-medium">Method</label>
-                <input type="text" name="configs[${idx}].method" class="mt-1 w-full border rounded p-2" required/>
-              </div>
-              <div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Method</label>
+                    <select name="configs[${idx}].method" class="w-full border rounde p-2" required>
+                        {{ range httpMethods }}
+                            <option value="{{ . }}">{{ . }}</option>
+                        {{ end }}
+                    </select>
+                </div>
+                <div>
                 <label class="block text-sm font-medium">Path</label>
                 <input type="text" name="configs[${idx}].path" class="mt-1 w-full border rounded p-2" required/>
               </div>
@@ -215,7 +222,6 @@
                 <input type="number" name="configs[${idx}].timeout" value="0" class="mt-1 w-full border rounded p-2"/>
               </div>
             </div>
-
             <div class="flex space-x-2 mb-2">
               <button type="button" @click="tab = 'requestHeaders'" :class="{ 'bg-blue-500 text-white': tab === 'requestHeaders' }" class="px-3 py-1 rounded border">Request Headers</button>
               <button type="button" @click="tab = 'requestBody'" :class="{ 'bg-blue-500 text-white': tab === 'requestBody' }" class="px-3 py-1 rounded border">Request Body</button>

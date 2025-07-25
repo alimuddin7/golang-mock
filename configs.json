@@ -29,7 +29,7 @@
       }
     },
     "statusCode": 200,
-    "timeout": 6000
+    "timeout": 0
   },
   {
     "name": "inquiry",
@@ -134,5 +134,18 @@
     "responseBody": {},
     "statusCode": 200,
     "timeout": 2000
+  },
+  {
+    "name": "Test2",
+    "method": "GET",
+    "path": "/api/test_2",
+    "requestHeaders": {},
+    "requestBody": {},
+    "responseHeaders": {},
+    "responseBody": {
+      "data": true
+    },
+    "statusCode": 200,
+    "timeout": 0
   }
 ]
