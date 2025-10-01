@@ -137,13 +137,40 @@
   },
   {
     "name": "Test2",
-    "method": "GET",
+    "method": "POST",
     "path": "/api/test_2",
     "requestHeaders": {},
     "requestBody": {},
     "responseHeaders": {},
     "responseBody": {
       "data": true
+    },
+    "statusCode": 200,
+    "timeout": 0
+  },
+  {
+    "name": "Path params",
+    "method": "GET",
+    "path": "/api/test/:id/:data",
+    "requestHeaders": {},
+    "requestBody": {},
+    "responseHeaders": {},
+    "responseBody": {
+      "data": "{{path.data}}",
+      "id": "{{path.id}}"
+    },
+    "statusCode": 200,
+    "timeout": 0
+  },
+  {
+    "name": "Get",
+    "method": "GET",
+    "path": "/api/test",
+    "requestHeaders": {},
+    "requestBody": {},
+    "responseHeaders": {},
+    "responseBody": {
+      "data": "success"
     },
     "statusCode": 200,
     "timeout": 0

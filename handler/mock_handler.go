@@ -3,6 +3,7 @@ package handler
 import (
 	"log"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -69,45 +70,67 @@ func (h *MockHandler) Dynamic(c *fiber.Ctx) error {
 	path := c.Path()
 
 	for _, cfg := range h.Configs {
-		if cfg.Method == method && cfg.Path == path {
-			// Validate headers
-			headerMap := map[string]string{}
-			for k := range cfg.RequestHeaders {
-				val := c.Get(k)
-				if val == "" {
-					return c.Status(400).JSON(fiber.Map{"error": "missing header: " + k})
+		if cfg.Method == method {
+			if ok, params := pathMatch(cfg.Path, path); ok {
+				// Validate headers
+				headerMap := map[string]string{}
+				for k := range cfg.RequestHeaders {
+					val := c.Get(k)
+					if val == "" {
+						return c.Status(400).JSON(fiber.Map{"error": "missing header: " + k})
+					}
+					headerMap[k] = val
 				}
-				headerMap[k] = val
-			}
 
-			bodyMap := map[string]interface{}{}
-			if (method == "POST" || method == "PUT") && cfg.RequestBody != nil {
-				if err := c.BodyParser(&bodyMap); err != nil {
-					return c.Status(400).JSON(fiber.Map{"error": "invalid body"})
-				}
-				for k := range cfg.RequestBody {
-					if _, ok := bodyMap[k]; !ok {
-						return c.Status(400).JSON(fiber.Map{"error": "missing body field: " + k})
+				bodyMap := map[string]interface{}{}
+				if (method == "POST" || method == "PUT") && cfg.RequestBody != nil {
+					if err := c.BodyParser(&bodyMap); err != nil {
+						return c.Status(400).JSON(fiber.Map{"error": "invalid body"})
+					}
+					for k := range cfg.RequestBody {
+						if _, ok := bodyMap[k]; !ok {
+							return c.Status(400).JSON(fiber.Map{"error": "missing body field: " + k})
+						}
 					}
 				}
-			}
-			queryMap := make(map[string]string)
-			c.Request().URI().QueryArgs().VisitAll(func(k, v []byte) {
-				queryMap[string(k)] = string(v)
-			})
+				queryMap := make(map[string]string)
+				c.Request().URI().QueryArgs().VisitAll(func(k, v []byte) {
+					queryMap[string(k)] = string(v)
+				})
 
-			rendered := service.RenderTemplateRecursive(cfg.ResponseBody, service.MapToStringMap(bodyMap), headerMap, queryMap)
+				rendered := service.RenderTemplateRecursive(cfg.ResponseBody, service.MapToStringMap(bodyMap), headerMap, queryMap, params)
 
-			for k, v := range cfg.ResponseHeaders {
-				c.Set(k, v)
-			}
-			if cfg.Timeout > 0 {
-				time.Sleep(time.Duration(cfg.Timeout) * time.Millisecond)
-			}
+				for k, v := range cfg.ResponseHeaders {
+					c.Set(k, v)
+				}
+				if cfg.Timeout > 0 {
+					time.Sleep(time.Duration(cfg.Timeout) * time.Millisecond)
+				}
 
-			return c.Status(cfg.StatusCode).JSON(rendered)
+				return c.Status(cfg.StatusCode).JSON(rendered)
+			}
 		}
 	}
 
 	return c.Status(404).SendString("Mock not found")
+}
+
+func pathMatch(cfgPath, reqPath string) (bool, map[string]string) {
+	cfgParts := strings.Split(strings.Trim(cfgPath, "/"), "/")
+	reqParts := strings.Split(strings.Trim(reqPath, "/"), "/")
+
+	if len(cfgParts) != len(reqParts) {
+		return false, nil
+	}
+
+	params := map[string]string{}
+	for i := range cfgParts {
+		if strings.HasPrefix(cfgParts[i], ":") {
+			paramName := strings.TrimPrefix(cfgParts[i], ":")
+			params[paramName] = reqParts[i]
+		} else if cfgParts[i] != reqParts[i] {
+			return false, nil
+		}
+	}
+	return true, params
 }

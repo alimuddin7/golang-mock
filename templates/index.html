@@ -185,74 +185,90 @@
 
             const html = `
         <div class="border rounded-lg shadow-sm bg-white" x-data="{ open: true, tab: 'info' }">
-          <div class="flex items-center justify-between px-4 py-2 bg-gray-100 cursor-pointer" @click="open = !open">
+        <div class="flex items-center justify-between px-4 py-2 bg-gray-100 cursor-pointer" @click="open = !open">
             <div>
-              <strong>New Config</strong>
+            <strong>New Config</strong>
             </div>
             <div>
-              <svg :class="{ 'rotate-180': open }" class="w-5 h-5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-              </svg>
+            <svg :class="{ 'rotate-180': open }" class="w-5 h-5 transform transition-transform" fill="none"
+                stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
             </div>
-          </div>
-          <div x-show="open" class="p-4 border-t">
+        </div>
+        <div x-show="open" class="p-4 border-t">
             <div class="mb-4">
-              <label class="block text-sm font-medium">Name</label>
-              <input type="text" name="configs[${idx}].name" class="mt-1 w-full border rounded p-2" required/>
+            <label class="block text-sm font-medium">Name</label>
+            <input type="text" name="configs[${idx}].name" class="mt-1 w-full border rounded p-2" required />
             </div>
             <div class="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                    <label class="block text-sm font-medium mb-1">Method</label>
-                    <select name="configs[${idx}].method" class="w-full border rounde p-2" required>
-                        {{ range httpMethods }}
-                            <option value="{{ . }}">{{ . }}</option>
-                        {{ end }}
-                    </select>
-                </div>
-                <div>
+            <div>
+                <label class="block text-sm font-medium mb-1">Method</label>
+                <select name="configs[${idx}].method" class="w-full border rounde p-2" required>
+                {{ range httpMethods }}
+                <option value="{{ . }}">{{ . }}</option>
+                {{ end }}
+                </select>
+            </div>
+            <div>
                 <label class="block text-sm font-medium">Path</label>
-                <input type="text" name="configs[${idx}].path" class="mt-1 w-full border rounded p-2" required/>
-              </div>
-              <div>
+                <input type="text" name="configs[${idx}].path" class="mt-1 w-full border rounded p-2" required />
+            </div>
+            <div>
                 <label class="block text-sm font-medium">Status Code</label>
-                <input type="number" name="configs[${idx}].statusCode" value="200" class="mt-1 w-full border rounded p-2" required/>
-              </div>
-              <div>
+                <input type="number" name="configs[${idx}].statusCode" value="200" class="mt-1 w-full border rounded p-2"
+                required />
+            </div>
+            <div>
                 <label class="block text-sm font-medium">Timeout</label>
-                <input type="number" name="configs[${idx}].timeout" value="0" class="mt-1 w-full border rounded p-2"/>
-              </div>
+                <input type="number" name="configs[${idx}].timeout" value="0" class="mt-1 w-full border rounded p-2" />
+            </div>
             </div>
             <div class="flex space-x-2 mb-2">
-              <button type="button" @click="tab = 'requestHeaders'" :class="{ 'bg-blue-500 text-white': tab === 'requestHeaders' }" class="px-3 py-1 rounded border">Request Headers</button>
-              <button type="button" @click="tab = 'requestBody'" :class="{ 'bg-blue-500 text-white': tab === 'requestBody' }" class="px-3 py-1 rounded border">Request Body</button>
-              <button type="button" @click="tab = 'responseHeaders'" :class="{ 'bg-blue-500 text-white': tab === 'responseHeaders' }" class="px-3 py-1 rounded border">Response Headers</button>
-              <button type="button" @click="tab = 'responseBody'" :class="{ 'bg-blue-500 text-white': tab === 'responseBody' }" class="px-3 py-1 rounded border">Response Body</button>
+            <button type="button" @click="tab = 'requestHeaders'"
+                :class="{ 'bg-blue-500 text-white': tab === 'requestHeaders' }" class="px-3 py-1 rounded border">Request
+                Headers</button>
+            <button type="button" @click="tab = 'requestBody'" :class="{ 'bg-blue-500 text-white': tab === 'requestBody' }"
+                class="px-3 py-1 rounded border">Request Body</button>
+            <button type="button" @click="tab = 'responseHeaders'"
+                :class="{ 'bg-blue-500 text-white': tab === 'responseHeaders' }" class="px-3 py-1 rounded border">Response
+                Headers</button>
+            <button type="button" @click="tab = 'responseBody'" :class="{ 'bg-blue-500 text-white': tab === 'responseBody' }"
+                class="px-3 py-1 rounded border">Response Body</button>
             </div>
 
             <div x-show="tab === 'requestHeaders'" class="mt-2">
-              <label for="requestHeaders-${idx}" class="font-semibold">Request Headers (JSON)</label>
-              <textarea id="requestHeaders-${idx}" name="configs[${idx}].requestHeaders" rows="5" class="w-full border rounded p-2">{}</textarea>
-              <button type="button" class="text-blue-500 text-xs mt-1" onclick="beautifyJSON('requestHeaders-${idx}')">Beautify JSON</button>
+            <label for="requestHeaders-${idx}" class="font-semibold">Request Headers (JSON)</label>
+            <textarea id="requestHeaders-${idx}" name="configs[${idx}].requestHeaders" rows="5"
+                class="w-full border rounded p-2">{}</textarea>
+            <button type="button" class="text-blue-500 text-xs mt-1" onclick="beautifyJSON('requestHeaders-${idx}')">Beautify
+                JSON</button>
             </div>
 
             <div x-show="tab === 'requestBody'" class="mt-2">
-              <label for="requestBody-${idx}" class="font-semibold">Request Body (JSON)</label>
-              <textarea id="requestBody-${idx}" name="configs[${idx}].requestBody" rows="5" class="w-full border rounded p-2">{}</textarea>
-              <button type="button" class="text-blue-500 text-xs mt-1" onclick="beautifyJSON('requestBody-${idx}')">Beautify JSON</button>
+            <label for="requestBody-${idx}" class="font-semibold">Request Body (JSON)</label>
+            <textarea id="requestBody-${idx}" name="configs[${idx}].requestBody" rows="5"
+                class="w-full border rounded p-2">{}</textarea>
+            <button type="button" class="text-blue-500 text-xs mt-1" onclick="beautifyJSON('requestBody-${idx}')">Beautify
+                JSON</button>
             </div>
 
             <div x-show="tab === 'responseHeaders'" class="mt-2">
-              <label for="responseHeaders-${idx}" class="font-semibold">Response Headers (JSON)</label>
-              <textarea id="responseHeaders-${idx}" name="configs[${idx}].responseHeaders" rows="5" class="w-full border rounded p-2">{}</textarea>
-              <button type="button" class="text-blue-500 text-xs mt-1" onclick="beautifyJSON('responseHeaders-${idx}')">Beautify JSON</button>
+            <label for="responseHeaders-${idx}" class="font-semibold">Response Headers (JSON)</label>
+            <textarea id="responseHeaders-${idx}" name="configs[${idx}].responseHeaders" rows="5"
+                class="w-full border rounded p-2">{}</textarea>
+            <button type="button" class="text-blue-500 text-xs mt-1" onclick="beautifyJSON('responseHeaders-${idx}')">Beautify
+                JSON</button>
             </div>
 
             <div x-show="tab === 'responseBody'" class="mt-2">
-              <label for="responseBody-${idx}" class="font-semibold">Response Body (JSON)</label>
-              <textarea id="responseBody-${idx}" name="configs[${idx}].responseBody" rows="5" class="w-full border rounded p-2">{}</textarea>
-              <button type="button" class="text-blue-500 text-xs mt-1" onclick="beautifyJSON('responseBody-${idx}')">Beautify JSON</button>
+            <label for="responseBody-${idx}" class="font-semibold">Response Body (JSON)</label>
+            <textarea id="responseBody-${idx}" name="configs[${idx}].responseBody" rows="5"
+                class="w-full border rounded p-2">{}</textarea>
+            <button type="button" class="text-blue-500 text-xs mt-1" onclick="beautifyJSON('responseBody-${idx}')">Beautify
+                JSON</button>
             </div>
-          </div>
+        </div>
         </div>
       `;
 

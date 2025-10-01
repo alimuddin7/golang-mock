@@ -6,7 +6,7 @@ import (
 )
 
 // RenderTemplateRecursive ...
-func RenderTemplateRecursive(data interface{}, bodyMap, headerMap, queryMap map[string]string) interface{} {
+func RenderTemplateRecursive(data interface{}, bodyMap, headerMap, queryMap, pathMap map[string]string) interface{} {
 	switch v := data.(type) {
 	case string:
 		for k, val := range bodyMap {
@@ -18,16 +18,19 @@ func RenderTemplateRecursive(data interface{}, bodyMap, headerMap, queryMap map[
 		for k, val := range queryMap {
 			v = strings.ReplaceAll(v, "{{query."+k+"}}", val)
 		}
+		for k, val := range pathMap {
+			v = strings.ReplaceAll(v, "{{path."+k+"}}", val)
+		}
 		return v
 	case map[string]interface{}:
 		result := make(map[string]interface{})
 		for key, val := range v {
-			result[key] = RenderTemplateRecursive(val, bodyMap, headerMap, queryMap)
+			result[key] = RenderTemplateRecursive(val, bodyMap, headerMap, queryMap, pathMap)
 		}
 		return result
 	case []interface{}:
 		for i, val := range v {
-			v[i] = RenderTemplateRecursive(val, bodyMap, headerMap, queryMap)
+			v[i] = RenderTemplateRecursive(val, bodyMap, headerMap, queryMap, pathMap)
 		}
 	}
 	return data
