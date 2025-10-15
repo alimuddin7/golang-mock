@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/template/html/v2"
 
 	"golang-mock/handler"
@@ -23,6 +24,9 @@ func main() {
 	h := handler.NewMockHandler("configs.json")
 
 	app.Use(h.RequestResponseLogger())
+	app.Use(compress.New(compress.Config{
+		Level: compress.LevelBestSpeed,
+	}))
 	app.Get("/", h.Index)
 	app.Post("/save", h.Save)
 	app.Post("/delete-config/:index", h.Delete)
