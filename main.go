@@ -22,6 +22,7 @@ func main() {
 
 	h := handler.NewMockHandler("configs.json")
 
+	app.Use(h.RequestResponseLogger())
 	app.Get("/", h.Index)
 	app.Post("/save", h.Save)
 	app.Post("/delete-config/:index", h.Delete)

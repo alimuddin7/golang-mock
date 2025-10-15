@@ -1,12 +1,15 @@
 package handler
 
 import (
+	"encoding/json"
 	"log"
+	"os"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/rs/zerolog"
 
 	"golang-mock/config"
 	"golang-mock/model"
@@ -17,6 +20,7 @@ import (
 type MockHandler struct {
 	Configs []model.MockConfig
 	Path    string
+	Log     zerolog.Logger
 }
 
 // NewMockHandler ...
@@ -28,6 +32,7 @@ func NewMockHandler(path string) *MockHandler {
 	return &MockHandler{
 		Configs: cfgs,
 		Path:    path,
+		Log:     zerolog.New(os.Stdout).With().Timestamp().Logger(),
 	}
 }
 
@@ -133,4 +138,48 @@ func pathMatch(cfgPath, reqPath string) (bool, map[string]string) {
 		}
 	}
 	return true, params
+}
+
+// RequestResponseLogger ...
+func (h *MockHandler) RequestResponseLogger() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		start := time.Now()
+
+		reqHeaders := c.GetReqHeaders()
+		reqBody := c.Body()
+
+		err := c.Next()
+
+		resBody := c.Response().Body()
+
+		event := h.Log.Info().
+			Str("METHOD", c.Method()).
+			Str("URL", c.OriginalURL()).
+			Any("HEAD", reqHeaders).
+			Any("BODY", parseJSONOrString(reqBody)).
+			Any("RES", parseJSONOrString(resBody)).
+			Dur("DURATION", time.Since(start))
+
+		if err != nil {
+			event = event.Err(err)
+		}
+
+		event.Msg("API LOG")
+
+		return err
+	}
+}
+
+func parseJSONOrString(body []byte) any {
+	if len(body) == 0 {
+		return nil
+	}
+
+	var v any
+	if err := json.Unmarshal(body, &v); err == nil {
+		return v // berhasil parse JSON → return object/map
+	}
+
+	// kalau bukan JSON valid (misal text biasa)
+	return string(body)
 }
