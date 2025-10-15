@@ -170,7 +170,21 @@
     "requestBody": {},
     "responseHeaders": {},
     "responseBody": {
-      "data": "success"
+      "AdditionalData": "",
+      "CompanyCode": "{{body.CompanyCode}}",
+      "CurrencyCode": "IDR",
+      "CustomerName": "Gandhi Wibowo",
+      "CustomerNumber": "{{body.CustomerNumber}}",
+      "DetailBills": [],
+      "FreeText": [],
+      "InquiryReason": {
+        "english": "Success",
+        "indonesian": "Sukses"
+      },
+      "InquiryStatus": "00",
+      "RequestID": "{{body.RequestID}}",
+      "SubCompany": "00000",
+      "TotalAmount": "0.00"
     },
     "statusCode": 200,
     "timeout": 0

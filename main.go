@@ -23,14 +23,13 @@ func main() {
 
 	h := handler.NewMockHandler("configs.json")
 
-	app.Use(h.RequestResponseLogger())
 	app.Use(compress.New(compress.Config{
 		Level: compress.LevelBestSpeed,
 	}))
 	app.Get("/", h.Index)
 	app.Post("/save", h.Save)
 	app.Post("/delete-config/:index", h.Delete)
-	app.All("/*", h.Dynamic)
+	app.All("/*", h.RequestResponseLogger(), h.Dynamic)
 
 	log.Fatal(app.Listen(":3000"))
 }
