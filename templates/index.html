@@ -1,363 +1,481 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mock API Editor</title>
+    <title>Mock API Editor - Split View</title>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
 </head>
 
-<body class="bg-gray-50 text-gray-800">
-    <div class="bg-blue-700 text-white p-6 rounded shadow">
-        <h1 class="text-2xl font-bold mb-1">Mock API Editor</h1>
-        <p class="text-sm mb-2">Edit and manage your mock API configurations easily and flexibly.</p>
-        <p class="text-xs text-blue-200 mb-4">Version: 1.0.0</p>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- Dynamic Field Usage -->
-            <div class="bg-blue-800 p-4 rounded">
-                <h2 class="text-sm font-semibold mb-2">Dynamic Field Usage</h2>
-                <ul class="list-disc list-inside text-sm space-y-1">
-                    <li>
-                        <code class="bg-blue-900 px-2 py-1 rounded text-white">{{ "{{body.fieldOfRequest}}" }}</code> –
-                        capture value from request body
-                    </li>
-                    <li>
-                        <code class="bg-blue-900 px-2 py-1 rounded text-white">{{ "{{header.fieldOfRequest}}" }}</code>
-                        –
-                        capture value from request headers
-                    </li>
-                    <li>
-                        <code class="bg-blue-900 px-2 py-1 rounded text-white">{{ "{{query.fieldOfRequest}}" }}</code> –
-                        capture value from query parameters
-                    </li>
-                    <li>
-                        <code class="bg-blue-900 px-2 py-1 rounded text-white">{{ "{{path.fieldOfRequest}}" }}</code> –
-                        capture value from path parameters
-                    </li>
+<body class="min-h-screen bg-base-200" x-data="configManager()">
+    <!-- Navbar -->
+    <div class="navbar bg-base-100 shadow-lg">
+        <div class="flex-1">
+            <a class="btn btn-ghost text-xl font-bold">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                </svg>
+                Mock API Editor
+            </a>
+        </div>
+        <div class="flex-none gap-2">
+            <div class="badge badge-primary">v1.0.0</div>
+            <div class="dropdown dropdown-end">
+                <label tabindex="0" class="btn btn-ghost btn-circle btn-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                    </svg>
+                </label>
+                <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-2xl bg-base-100 rounded-box w-52">
+                    <li><a onclick="setTheme('light')">🌞 Light</a></li>
+                    <li><a onclick="setTheme('dark')">🌙 Dark</a></li>
+                    <li><a onclick="setTheme('cupcake')">🧁 Cupcake</a></li>
+                    <li><a onclick="setTheme('cyberpunk')">🤖 Cyberpunk</a></li>
+                    <li><a onclick="setTheme('synthwave')">🌆 Synthwave</a></li>
+                    <li><a onclick="setTheme('forest')">🌲 Forest</a></li>
                 </ul>
-            </div>
-
-            <!-- Validation Note -->
-            <div class="bg-yellow-600 p-4 rounded">
-                <h2 class="text-sm font-semibold mb-2">Validation Note</h2>
-                <p class="text-sm">
-                    All fields defined under
-                    <code class="bg-yellow-800 px-2 py-1 rounded text-white">requestHeaders</code> and
-                    <code class="bg-yellow-800 px-2 py-1 rounded text-white">requestBody</code>
-                    are <strong>required</strong> by default.
-                </p>
-                <p class="text-sm mt-2">
-                    If any required field is missing or mismatched, the server will respond with
-                    <span class="font-semibold">400 Bad Request</span>.
-                </p>
-                <p class="text-sm">
-                    Parameters <code>timeout in milliseconds</code>, if set to 0, will not apply any delay.
-                </p>
             </div>
         </div>
     </div>
 
-    <div class="max-w-5xl mx-auto p-6">
-        <form id="configForm" onsubmit="submitForm(event)">
-            <div id="configContainer" class="space-y-4">
-                {{ range $i, $cfg := .Configs }}
-                <div class="border rounded-lg shadow-sm bg-white" x-data="{ open: false, tab: 'info' }">
-                    <div class="flex items-center justify-between px-4 py-2 bg-gray-100 cursor-pointer"
-                        @click="open = !open">
-                        <div>
-                            <strong>{{ $cfg.Name }}</strong> <span class="text-sm text-gray-500">({{ $cfg.Method }} {{
-                                $cfg.Path }})</span>
-                            <button type="button" onclick="deleteConfig({{ $i }}, event)"
-                                class="text-red-500 hover:text-red-700">🗑 Delete</button>
-                        </div>
-                        <div>
-                            <svg :class="{ 'rotate-180': open }" class="w-5 h-5 transform transition-transform"
-                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M19 9l-7 7-7-7" />
-                            </svg>
+    <!-- Collapsible Info Section -->
+    <div class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white">
+        <div class="collapse collapse-arrow">
+            <input type="checkbox" />
+            <div class="collapse-title text-xl font-bold text-center py-4">
+                Mock API Editor - Click to view features
+            </div>
+            <div class="collapse-content">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pb-4">
+                    <!-- Card 1 -->
+                    <div class="card bg-white/10 backdrop-blur-md border border-white/20 text-white shadow-xl">
+                        <div class="card-body p-4">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="p-2 bg-white/20 rounded-full">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                    </svg>
+                                </div>
+                                <h3 class="font-bold text-sm">Dynamic Fields</h3>
+                            </div>
+                            <p class="text-xs opacity-80 mb-1">Use <code
+                                    class="bg-black/30 px-1 rounded">{{ "{{body.field}}" }}</code> to inject request
+                                data</p>
+                            <p class="text-xs opacity-80 mb-1">Use <code
+                                    class="bg-black/30 px-1 rounded">{{ "{{header.field}}" }}</code> to inject headers
+                            </p>
+                            <p class="text-xs opacity-80">Use <code
+                                    class="bg-black/30 px-1 rounded">{{ "{{query.field}}" }}</code> to inject query
+                                params</p>
                         </div>
                     </div>
-                    <div x-show="open" class="p-4 border-t">
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium">Name</label>
-                            <input type="text" name="configs[{{ $i }}].name" value="{{ $cfg.Name }}"
-                                class="mt-1 w-full border rounded p-2" required />
+
+                    <!-- Card 2 -->
+                    <div class="card bg-white/10 backdrop-blur-md border border-white/20 text-white shadow-xl">
+                        <div class="card-body p-4">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="p-2 bg-white/20 rounded-full">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <h3 class="font-bold text-sm">Auto Validation</h3>
+                            </div>
+                            <p class="text-xs opacity-80">If any required field is missing or mismatched, the server
+                                will respond with 400 Bad Request.</p>
                         </div>
-                        <div class="grid grid-cols-2 gap-4 mb-4">
-                            <div>
-                                <label class="block text-sm font-medium mb-1">Method</label>
-                                <select name="configs[{{ $i }}].method" class="w-full border rounded p-2" required>
-                                    {{ range httpMethods }}
-                                    <option value="{{ . }}" {{ if eq $cfg.Method . }}selected{{ end }}>{{ . }}</option>
-                                    {{ end }}
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium">Path</label>
-                                <input type="text" name="configs[{{ $i }}].path" value="{{ $cfg.Path }}"
-                                    class="mt-1 w-full border rounded p-2" required />
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium">Status Code</label>
-                                <input type="number" name="configs[{{ $i }}].statusCode" value="{{ $cfg.StatusCode }}"
-                                    class="mt-1 w-full border rounded p-2" required />
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium">Timeout</label>
-                                <input type="number" name="configs[{{ $i }}].timeout" value="{{ $cfg.Timeout }}"
-                                    class="mt-1 w-full border rounded p-2" />
-                            </div>
-                        </div>
+                    </div>
 
-                        <div>
-                            <div class="flex space-x-2 mb-2">
-                                <button type="button" @click="tab = 'requestHeaders'"
-                                    :class="{ 'bg-blue-500 text-white': tab === 'requestHeaders' }"
-                                    class="px-3 py-1 rounded border">Request Headers</button>
-                                <button type="button" @click="tab = 'requestBody'"
-                                    :class="{ 'bg-blue-500 text-white': tab === 'requestBody' }"
-                                    class="px-3 py-1 rounded border">Request Body</button>
-                                <button type="button" @click="tab = 'responseHeaders'"
-                                    :class="{ 'bg-blue-500 text-white': tab === 'responseHeaders' }"
-                                    class="px-3 py-1 rounded border">Response Headers</button>
-                                <button type="button" @click="tab = 'responseBody'"
-                                    :class="{ 'bg-blue-500 text-white': tab === 'responseBody' }"
-                                    class="px-3 py-1 rounded border">Response Body</button>
+                    <!-- Card 3 -->
+                    <div class="card bg-white/10 backdrop-blur-md border border-white/20 text-white shadow-xl">
+                        <div class="card-body p-4">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="p-2 bg-white/20 rounded-full">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <h3 class="font-bold text-sm">Timeout Control</h3>
                             </div>
-
-                            <div x-show="tab === 'requestHeaders'" class="mt-2">
-                                <label for="requestHeaders-{{ $i }}" class="font-semibold">Request Headers
-                                    (JSON)</label>
-                                <textarea id="requestHeaders-{{ $i }}" name="configs[{{ $i }}].requestHeaders" rows="5"
-                                    class="w-full border rounded p-2">{{ toJsonPretty $cfg.RequestHeaders }}</textarea>
-                                <button type="button" class="text-blue-500 text-xs mt-1"
-                                    onclick="beautifyJSON('requestHeaders-{{ $i }}')">Beautify JSON</button>
-                            </div>
-
-                            <div x-show="tab === 'requestBody'" class="mt-2">
-                                <label for="requestBody-{{ $i }}" class="font-semibold">Request Body (JSON)</label>
-                                <textarea id="requestBody-{{ $i }}" name="configs[{{ $i }}].requestBody" rows="5"
-                                    class="w-full border rounded p-2">{{ toJsonPretty $cfg.RequestBody }}</textarea>
-                                <button type="button" class="text-blue-500 text-xs mt-1"
-                                    onclick="beautifyJSON('requestBody-{{ $i }}')">Beautify JSON</button>
-                            </div>
-
-                            <div x-show="tab === 'responseHeaders'" class="mt-2">
-                                <label for="responseHeaders-{{ $i }}" class="font-semibold">Response Headers
-                                    (JSON)</label>
-                                <textarea id="responseHeaders-{{ $i }}" name="configs[{{ $i }}].responseHeaders"
-                                    rows="5"
-                                    class="w-full border rounded p-2">{{ toJsonPretty $cfg.ResponseHeaders }}</textarea>
-                                <button type="button" class="text-blue-500 text-xs mt-1"
-                                    onclick="beautifyJSON('responseHeaders-{{ $i }}')">Beautify JSON</button>
-                            </div>
-
-                            <div x-show="tab === 'responseBody'" class="mt-2">
-                                <label for="responseBody-{{ $i }}" class="font-semibold">Response Body (JSON)</label>
-                                <textarea id="responseBody-{{ $i }}" name="configs[{{ $i }}].responseBody" rows="5"
-                                    class="w-full border rounded p-2">{{ toJsonPretty $cfg.ResponseBody }}</textarea>
-                                <button type="button" class="text-blue-500 text-xs mt-1"
-                                    onclick="beautifyJSON('responseBody-{{ $i }}')">Beautify JSON</button>
-                            </div>
+                            <p class="text-xs opacity-80">Simulate latency by setting a custom timeout in milliseconds.
+                            </p>
                         </div>
                     </div>
                 </div>
-                {{ end }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Split View Container -->
+    <div class="flex flex-col md:flex-row h-[calc(100vh-64px)]">
+        <!-- Mobile Menu Toggle -->
+        <div class="md:hidden bg-base-100 p-2 border-b border-base-300">
+            <button @click="showSidebar = !showSidebar" class="btn btn-sm btn-ghost w-full justify-between">
+                <span>Configurations Menu</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Left Sidebar -->
+        <div class="w-full md:w-80 bg-base-100 border-r border-base-300 flex flex-col"
+            :class="{ 'hidden md:flex': !showSidebar, 'flex': showSidebar }">
+            <div class="p-4 border-b border-base-300">
+                <div class="flex justify-between items-center mb-3">
+                    <h2 class="text-lg font-bold">Configurations</h2>
+                    <button @click="addNewConfig()" class="btn btn-success btn-sm btn-circle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                    </button>
+                </div>
+                <input type="text" placeholder="Search..." class="input input-bordered input-sm w-full"
+                    x-model="searchQuery" />
+                <div class="text-xs opacity-60 mt-2" x-text="`${filteredConfigs.length} configs`"></div>
             </div>
 
-            <div class="mt-6 flex justify-between">
-                <button type="button" onclick="addConfig()"
-                    class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
-                    Add Config
-                </button>
-                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded">
-                    Save All
-                </button>
+            <div class="flex-1 overflow-y-auto">
+                <ul class="menu menu-sm p-2">
+                    <template x-for="(cfg, index) in filteredConfigs" :key="index">
+                        <li>
+                            <a @click="selectConfig(index)" :class="{ 'active': selectedIndex === index }"
+                                class="flex items-start py-3">
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <div :class="{
+                                            'badge-info': cfg.method === 'GET',
+                                            'badge-success': cfg.method === 'POST',
+                                            'badge-warning': cfg.method === 'PUT',
+                                            'badge-error': cfg.method === 'DELETE'
+                                        }" class="badge badge-xs">
+                                            <span x-text="cfg.method"></span>
+                                        </div>
+                                        <span class="font-semibold text-xs truncate" x-text="cfg.name"></span>
+                                    </div>
+                                    <div class="text-xs opacity-60 truncate" x-text="cfg.path"></div>
+                                </div>
+                            </a>
+                        </li>
+                    </template>
+                </ul>
             </div>
-        </form>
+        </div>
+
+        <!-- Right Panel -->
+        <div class="flex-1 overflow-y-auto">
+            <template x-if="selectedConfig">
+                <div class="p-6 max-w-5xl mx-auto">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center gap-3">
+                            <div :class="{
+                                'badge-info': selectedConfig.method === 'GET',
+                                'badge-success': selectedConfig.method === 'POST',
+                                'badge-warning': selectedConfig.method === 'PUT',
+                                'badge-error': selectedConfig.method === 'DELETE'
+                            }" class="badge badge-lg">
+                                <span x-text="selectedConfig.method"></span>
+                            </div>
+                            <h2 class="text-2xl font-bold">Configuration Details</h2>
+                        </div>
+                        <button @click="deleteCurrentConfig()" class="btn btn-error btn-sm gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                            Delete
+                        </button>
+                    </div>
+
+                    <div class="bg-base-100 rounded-lg p-6 shadow-lg space-y-4">
+                        <div class="form-control">
+                            <label class="label"><span class="label-text font-semibold">Name</span></label>
+                            <input type="text" x-model="selectedConfig.name" class="input input-bordered" />
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="form-control">
+                                <label class="label"><span class="label-text font-semibold">Method</span></label>
+                                <select x-model="selectedConfig.method" class="select select-bordered">
+                                    {{ range httpMethods }}
+                                    <option value="{{ . }}">{{ . }}</option>
+                                    {{ end }}
+                                </select>
+                            </div>
+                            <div class="form-control">
+                                <label class="label"><span class="label-text font-semibold">Status Code</span></label>
+                                <input type="number" x-model="selectedConfig.statusCode" class="input input-bordered" />
+                            </div>
+                            <div class="form-control">
+                                <label class="label"><span class="label-text font-semibold">Timeout (ms)</span></label>
+                                <input type="number" x-model="selectedConfig.timeout" class="input input-bordered" />
+                            </div>
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label"><span class="label-text font-semibold">Path</span></label>
+                            <input type="text" x-model="selectedConfig.path" class="input input-bordered" />
+                        </div>
+
+                        <div class="tabs tabs-boxed bg-base-200">
+                            <a class="tab" :class="{ 'tab-active': activeTab === 'requestHeaders' }"
+                                @click="activeTab = 'requestHeaders'">Request Headers</a>
+                            <a class="tab" :class="{ 'tab-active': activeTab === 'requestBody' }"
+                                @click="activeTab = 'requestBody'">Request Body</a>
+                            <a class="tab" :class="{ 'tab-active': activeTab === 'responseHeaders' }"
+                                @click="activeTab = 'responseHeaders'">Response Headers</a>
+                            <a class="tab" :class="{ 'tab-active': activeTab === 'responseBody' }"
+                                @click="activeTab = 'responseBody'">Response Body</a>
+                        </div>
+
+                        <div x-show="activeTab === 'requestHeaders'" class="form-control">
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="label-text font-semibold">Request Headers (JSON)</label>
+                                <button type="button" @click="beautifyJSON('requestHeaders')"
+                                    class="btn btn-xs btn-ghost">Beautify</button>
+                            </div>
+                            <textarea x-model="selectedConfig.requestHeaders" rows="8"
+                                class="textarea textarea-bordered font-mono text-sm"></textarea>
+                        </div>
+
+                        <div x-show="activeTab === 'requestBody'" class="form-control">
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="label-text font-semibold">Request Body (JSON)</label>
+                                <button type="button" @click="beautifyJSON('requestBody')"
+                                    class="btn btn-xs btn-ghost">Beautify</button>
+                            </div>
+                            <textarea x-model="selectedConfig.requestBody" rows="8"
+                                class="textarea textarea-bordered font-mono text-sm"></textarea>
+                        </div>
+
+                        <div x-show="activeTab === 'responseHeaders'" class="form-control">
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="label-text font-semibold">Response Headers (JSON)</label>
+                                <button type="button" @click="beautifyJSON('responseHeaders')"
+                                    class="btn btn-xs btn-ghost">Beautify</button>
+                            </div>
+                            <textarea x-model="selectedConfig.responseHeaders" rows="8"
+                                class="textarea textarea-bordered font-mono text-sm"></textarea>
+                        </div>
+
+                        <div x-show="activeTab === 'responseBody'" class="form-control">
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="label-text font-semibold">Response Body (JSON)</label>
+                                <button type="button" @click="beautifyJSON('responseBody')"
+                                    class="btn btn-xs btn-ghost">Beautify</button>
+                            </div>
+                            <textarea x-model="selectedConfig.responseBody" rows="8"
+                                class="textarea textarea-bordered font-mono text-sm"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+            <template x-if="!selectedConfig">
+                <div class="flex items-center justify-center h-full">
+                    <div class="text-center opacity-50">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 mx-auto mb-4" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <p class="text-lg">Select a configuration to edit</p>
+                        <p class="text-sm mt-2">or create a new one using the + button</p>
+                    </div>
+                </div>
+            </template>
+        </div>
     </div>
+
+    <!-- Success Modal -->
+    <dialog id="success_modal" class="modal">
+        <div class="modal-box">
+            <h3 class="font-bold text-lg">✅ Success!</h3>
+            <p class="py-4" x-text="modalMessage"></p>
+            <div class="modal-action">
+                <form method="dialog">
+                    <button class="btn btn-primary">OK</button>
+                </form>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- Floating Save Button -->
+    <button @click="saveAll()" class="btn btn-primary fixed bottom-6 right-6 shadow-2xl z-50">
+        Save All
+    </button>
+
+    <!-- Data Loading -->
+    <script>
+        // Assign directly to window object to ensure availability
+        window.serverConfigs = {{ .Configs }};
+        console.log('Window serverConfigs loaded:', window.serverConfigs ? window.serverConfigs.length : 'null');
+    </script>
+
     <script src="https://unpkg.com/alpinejs" defer></script>
     <script>
-        let dynamicIndex = {{ len .Configs }};
-
-        function addConfig() {
-            const container = document.getElementById('configContainer');
-            const idx = dynamicIndex++;
-
-            const html = `
-        <div class="border rounded-lg shadow-sm bg-white" x-data="{ open: true, tab: 'info' }">
-        <div class="flex items-center justify-between px-4 py-2 bg-gray-100 cursor-pointer" @click="open = !open">
-            <div>
-            <strong>New Config</strong>
-            </div>
-            <div>
-            <svg :class="{ 'rotate-180': open }" class="w-5 h-5 transform transition-transform" fill="none"
-                stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
-            </div>
-        </div>
-        <div x-show="open" class="p-4 border-t">
-            <div class="mb-4">
-            <label class="block text-sm font-medium">Name</label>
-            <input type="text" name="configs[${idx}].name" class="mt-1 w-full border rounded p-2" required />
-            </div>
-            <div class="grid grid-cols-2 gap-4 mb-4">
-            <div>
-                <label class="block text-sm font-medium mb-1">Method</label>
-                <select name="configs[${idx}].method" class="w-full border rounde p-2" required>
-                {{ range httpMethods }}
-                <option value="{{ . }}">{{ . }}</option>
-                {{ end }}
-                </select>
-            </div>
-            <div>
-                <label class="block text-sm font-medium">Path</label>
-                <input type="text" name="configs[${idx}].path" class="mt-1 w-full border rounded p-2" required />
-            </div>
-            <div>
-                <label class="block text-sm font-medium">Status Code</label>
-                <input type="number" name="configs[${idx}].statusCode" value="200" class="mt-1 w-full border rounded p-2"
-                required />
-            </div>
-            <div>
-                <label class="block text-sm font-medium">Timeout</label>
-                <input type="number" name="configs[${idx}].timeout" value="0" class="mt-1 w-full border rounded p-2" />
-            </div>
-            </div>
-            <div class="flex space-x-2 mb-2">
-            <button type="button" @click="tab = 'requestHeaders'"
-                :class="{ 'bg-blue-500 text-white': tab === 'requestHeaders' }" class="px-3 py-1 rounded border">Request
-                Headers</button>
-            <button type="button" @click="tab = 'requestBody'" :class="{ 'bg-blue-500 text-white': tab === 'requestBody' }"
-                class="px-3 py-1 rounded border">Request Body</button>
-            <button type="button" @click="tab = 'responseHeaders'"
-                :class="{ 'bg-blue-500 text-white': tab === 'responseHeaders' }" class="px-3 py-1 rounded border">Response
-                Headers</button>
-            <button type="button" @click="tab = 'responseBody'" :class="{ 'bg-blue-500 text-white': tab === 'responseBody' }"
-                class="px-3 py-1 rounded border">Response Body</button>
-            </div>
-
-            <div x-show="tab === 'requestHeaders'" class="mt-2">
-            <label for="requestHeaders-${idx}" class="font-semibold">Request Headers (JSON)</label>
-            <textarea id="requestHeaders-${idx}" name="configs[${idx}].requestHeaders" rows="5"
-                class="w-full border rounded p-2">{}</textarea>
-            <button type="button" class="text-blue-500 text-xs mt-1" onclick="beautifyJSON('requestHeaders-${idx}')">Beautify
-                JSON</button>
-            </div>
-
-            <div x-show="tab === 'requestBody'" class="mt-2">
-            <label for="requestBody-${idx}" class="font-semibold">Request Body (JSON)</label>
-            <textarea id="requestBody-${idx}" name="configs[${idx}].requestBody" rows="5"
-                class="w-full border rounded p-2">{}</textarea>
-            <button type="button" class="text-blue-500 text-xs mt-1" onclick="beautifyJSON('requestBody-${idx}')">Beautify
-                JSON</button>
-            </div>
-
-            <div x-show="tab === 'responseHeaders'" class="mt-2">
-            <label for="responseHeaders-${idx}" class="font-semibold">Response Headers (JSON)</label>
-            <textarea id="responseHeaders-${idx}" name="configs[${idx}].responseHeaders" rows="5"
-                class="w-full border rounded p-2">{}</textarea>
-            <button type="button" class="text-blue-500 text-xs mt-1" onclick="beautifyJSON('responseHeaders-${idx}')">Beautify
-                JSON</button>
-            </div>
-
-            <div x-show="tab === 'responseBody'" class="mt-2">
-            <label for="responseBody-${idx}" class="font-semibold">Response Body (JSON)</label>
-            <textarea id="responseBody-${idx}" name="configs[${idx}].responseBody" rows="5"
-                class="w-full border rounded p-2">{}</textarea>
-            <button type="button" class="text-blue-500 text-xs mt-1" onclick="beautifyJSON('responseBody-${idx}')">Beautify
-                JSON</button>
-            </div>
-        </div>
-        </div>
-      `;
-
-            container.insertAdjacentHTML('beforeend', html);
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
         }
 
-        async function submitForm(e) {
-            e.preventDefault();
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
 
-            const formData = new FormData(document.getElementById('configForm'));
-            const entries = Object.fromEntries(formData.entries());
+        function configManager() {
+            return {
+                configs: [],
+                selectedIndex: null,
+                searchQuery: '',
+                activeTab: 'requestHeaders',
+                showSidebar: false,
+                modalMessage: '',
 
-            const configMap = {};
+                get selectedConfig() {
+                    return this.selectedIndex !== null ? this.configs[this.selectedIndex] : null;
+                },
 
-            for (const [key, val] of Object.entries(entries)) {
-                const match = key.match(/configs\[(\d+)\]\.(\w+)/);
-                if (!match) continue;
+                get filteredConfigs() {
+                    if (!this.searchQuery) return this.configs;
+                    const query = this.searchQuery.toLowerCase();
+                    return this.configs.filter(function (cfg) {
+                        return cfg.name.toLowerCase().includes(query) ||
+                            cfg.path.toLowerCase().includes(query) ||
+                            cfg.method.toLowerCase().includes(query);
+                    });
+                },
 
-                const index = parseInt(match[1]);
-                const field = match[2];
+                selectConfig(index) {
+                    this.selectedIndex = index;
+                    this.activeTab = 'requestHeaders';
+                    this.showSidebar = false; // Close sidebar on mobile selection
+                },
 
-                configMap[index] = configMap[index] || {
-                    name: "",
-                    method: "",
-                    path: "",
-                    statusCode: 200,
-                    timeout: 0,
-                    requestHeaders: {},
-                    requestBody: {},
-                    responseHeaders: {},
-                    responseBody: {}
-                };
+                addNewConfig() {
+                    const newConfig = {
+                        name: 'New Configuration',
+                        method: 'GET',
+                        path: '/api/new',
+                        statusCode: 200,
+                        timeout: 0,
+                        requestHeaders: '{}',
+                        requestBody: '{}',
+                        responseHeaders: '{}',
+                        responseBody: '{}'
+                    };
+                    this.configs.push(newConfig);
+                    this.selectedIndex = this.configs.length - 1;
+                },
 
-                if (["requestHeaders", "requestBody", "responseHeaders", "responseBody"].includes(field)) {
+                deleteCurrentConfig() {
+                    if (this.selectedIndex === null) return;
+
+                    if (confirm('Are you sure you want to delete this configuration?')) {
+                        fetch('/delete-config/' + this.selectedIndex, { method: 'POST' })
+                            .then(function (res) {
+                                if (res.ok) {
+                                    location.reload();
+                                } else {
+                                    alert('Failed to delete configuration');
+                                }
+                            });
+                    }
+                },
+
+                beautifyJSON(field) {
                     try {
-                        configMap[index][field] = JSON.parse(val || "{}");
-                    } catch (err) {
-                        alert(`Invalid JSON in field "${field}" of config #${index + 1}`);
-                        return;
+                        const parsed = JSON.parse(this.selectedConfig[field]);
+                        this.selectedConfig[field] = JSON.stringify(parsed, null, 2);
+                    } catch (e) {
+                        alert('Invalid JSON format');
                     }
-                } else if (field === "statusCode") {
-                    configMap[index][field] = parseInt(val);
-                } else if (field === "timeout") {
-                    configMap[index][field] = parseInt(val);
-                } else {
-                    configMap[index][field] = val;
+                },
+
+                saveAll() {
+                    const configsToSave = this.configs.map(function (cfg) {
+                        return {
+                            name: cfg.name,
+                            method: cfg.method,
+                            path: cfg.path,
+                            statusCode: cfg.statusCode,
+                            timeout: cfg.timeout,
+                            requestHeaders: JSON.parse(cfg.requestHeaders || '{}'),
+                            requestBody: JSON.parse(cfg.requestBody || '{}'),
+                            responseHeaders: JSON.parse(cfg.responseHeaders || '{}'),
+                            responseBody: JSON.parse(cfg.responseBody || '{}')
+                        };
+                    });
+
+                    fetch('/save', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(configsToSave)
+                    })
+                        .then(function (res) { return res.text(); })
+                        .then((msg) => {
+                            this.modalMessage = msg;
+                            document.getElementById('success_modal').showModal();
+                            // Reload after modal is closed
+                            setTimeout(() => location.reload(), 1500);
+                        })
+                        .catch(function (err) {
+                            alert('Error saving configurations: ' + err.message);
+                        });
+                },
+
+                init() {
+                    console.log('Alpine init started');
+                    let data = window.serverConfigs || [];
+
+                    if (!Array.isArray(data)) {
+                        console.warn('window.serverConfigs is not an array, defaulting to empty');
+                        data = [];
+                    }
+
+                    console.log('Initializing with configs:', data.length);
+
+                    this.configs = data.map(function (cfg) {
+                        return {
+                            name: cfg.name || 'Unnamed',
+                            method: cfg.method || 'GET',
+                            path: cfg.path || '/',
+                            statusCode: cfg.statusCode || 200,
+                            timeout: cfg.timeout || 0,
+                            requestHeaders: JSON.stringify(cfg.requestHeaders || {}, null, 2),
+                            requestBody: JSON.stringify(cfg.requestBody || {}, null, 2),
+                            responseHeaders: JSON.stringify(cfg.responseHeaders || {}, null, 2),
+                            responseBody: JSON.stringify(cfg.responseBody || {}, null, 2)
+                        };
+                    });
+
+                    console.log('Final configs count:', this.configs.length);
+
+                    if (this.configs.length > 0) {
+                        this.selectedIndex = 0;
+                    }
                 }
-            }
-
-            const configs = Object.values(configMap);
-
-            const res = await fetch("/save", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(configs)
-            });
-
-            const msg = await res.text();
-            alert(msg);
-            location.reload(); // auto reload
-        }
-
-        function deleteConfig(index, event) {
-            if (event) event.preventDefault();
-
-            if (confirm("Yakin ingin menghapus config ini?")) {
-                fetch(`/delete-config/${index}`, {
-                    method: "POST",
-                }).then((res) => {
-                    if (res.ok) {
-                        location.reload();
-                    } else {
-                        alert("Gagal menghapus config");
-                    }
-                });
-            }
-        }
-        function beautifyJSON(id) {
-            const textarea = document.getElementById(id);
-            try {
-                const parsed = JSON.parse(textarea.value);
-                const pretty = JSON.stringify(parsed, null, 2);
-                textarea.value = pretty;
-            } catch (e) {
-                alert("Invalid JSON format");
             }
         }
     </script>

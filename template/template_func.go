@@ -2,17 +2,18 @@ package template
 
 import (
 	"encoding/json"
+	"html/template"
 
 	"golang-mock/model"
 )
 
 // ToJSONPretty ...
-func ToJSONPretty(v interface{}) string {
+func ToJSONPretty(v interface{}) template.HTML {
 	b, err := json.MarshalIndent(v, "", "  ")
 	if err != nil {
 		return "{}"
 	}
-	return string(b)
+	return template.HTML(b)
 }
 
 // HTTPMethods ...

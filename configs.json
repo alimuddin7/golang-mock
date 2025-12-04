@@ -1,78 +1,5 @@
 [
   {
-    "name": "token",
-    "method": "POST",
-    "path": "/api/token",
-    "requestHeaders": {
-      "Accept": "*/*",
-      "Content-Type": "application/json",
-      "X-Api-Key": "***",
-      "X-Trace-Id": "f48518a8-613d-11f0-bf3a-8add2c647ba"
-    },
-    "requestBody": {
-      "Password": "***",
-      "Username": "admin"
-    },
-    "responseHeaders": {
-      "X-Mock": "true"
-    },
-    "responseBody": {
-      "data": {
-        "id": "idm",
-        "id_token": "***",
-        "username": "{{body.Username}}"
-      },
-      "meta": {
-        "code": 200,
-        "message": "Success",
-        "status": true
-      }
-    },
-    "statusCode": 200,
-    "timeout": 0
-  },
-  {
-    "name": "inquiry",
-    "method": "POST",
-    "path": "/api/inquiry",
-    "requestHeaders": {
-      "Accept": "*/*",
-      "Authorization": "Bearer ***",
-      "Content-Type": "application/json",
-      "X-Trace-Id": "1013435c-613e-11f0-bf3a-8add2c647b68"
-    },
-    "requestBody": {
-      "AdditionalData": "",
-      "ChannelType": "BCA",
-      "CompanyCode": "8481",
-      "CustomerNumber": "108720212451",
-      "RequestID": "292ae586-2773-4ef6-a479-d7214c6424d9",
-      "TransactionDate": "15/07/2025 12:39:23"
-    },
-    "responseHeaders": {
-      "X-Mock": "true"
-    },
-    "responseBody": {
-      "AdditionalData": "",
-      "CompanyCode": "{{body.CompanyCode}}",
-      "CurrencyCode": "IDR",
-      "CustomerName": "Gandhi Wibowo",
-      "CustomerNumber": "{{body.CustomerNumber}}",
-      "DetailBills": [],
-      "FreeText": [],
-      "InquiryReason": {
-        "english": "Success",
-        "indonesian": "Sukses"
-      },
-      "InquiryStatus": "00",
-      "RequestID": "{{body.RequestID}}",
-      "SubCompany": "00000",
-      "TotalAmount": "0.00"
-    },
-    "statusCode": 200,
-    "timeout": 0
-  },
-  {
     "name": "payment",
     "method": "POST",
     "path": "/api/payment",
@@ -185,6 +112,32 @@
       "RequestID": "{{body.RequestID}}",
       "SubCompany": "00000",
       "TotalAmount": "0.00"
+    },
+    "statusCode": 200,
+    "timeout": 0
+  },
+  {
+    "name": "Test 3",
+    "method": "GET",
+    "path": "/api/new3",
+    "requestHeaders": {},
+    "requestBody": {},
+    "responseHeaders": {},
+    "responseBody": {
+      "data": "success"
+    },
+    "statusCode": 200,
+    "timeout": 0
+  },
+  {
+    "name": "Api Test 4",
+    "method": "GET",
+    "path": "/api/new/4",
+    "requestHeaders": {},
+    "requestBody": {},
+    "responseHeaders": {},
+    "responseBody": {
+      "data": "ok"
     },
     "statusCode": 200,
     "timeout": 0

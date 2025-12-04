@@ -25,9 +25,17 @@ type MockHandler struct {
 
 // NewMockHandler ...
 func NewMockHandler(path string) *MockHandler {
+	cwd, _ := os.Getwd()
+	log.Println("Current Working Directory:", cwd)
+	log.Println("Loading configs from:", path)
 	cfgs, err := config.LoadConfigs(path)
 	if err != nil {
 		log.Println("Load config error:", err)
+	} else {
+		log.Printf("Successfully loaded %d configs\n", len(cfgs))
+	}
+	if cfgs == nil {
+		cfgs = []model.MockConfig{}
 	}
 	return &MockHandler{
 		Configs: cfgs,
@@ -38,6 +46,17 @@ func NewMockHandler(path string) *MockHandler {
 
 // Index ...
 func (h *MockHandler) Index(c *fiber.Ctx) error {
+	// Try to reload if empty (debugging purpose)
+	if len(h.Configs) == 0 {
+		log.Println("Configs empty, attempting to reload from", h.Path)
+		loaded, err := config.LoadConfigs(h.Path)
+		if err == nil && len(loaded) > 0 {
+			h.Configs = loaded
+			log.Println("Reloaded configs:", len(h.Configs))
+		}
+	}
+
+	// log.Printf("Rendering index with %d configs\n", len(h.Configs))
 	return c.Render("index", fiber.Map{
 		"Configs": h.Configs,
 	})
