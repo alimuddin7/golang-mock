@@ -7,7 +7,7 @@
       "Accept": "*/*",
       "Authorization": "Bearer ***",
       "Content-Type": "application/json",
-      "X-Trace-Id": "4f1f8fbd-613e-11f0-bf3a-8add2c647b68"
+      "X-Trace-Id": "4f1f8fbd-613e-11f0-bf3a-8add2c647b681"
     },
     "requestBody": {
       "AdditionalData": "",
@@ -60,7 +60,7 @@
     "responseHeaders": {},
     "responseBody": {},
     "statusCode": 200,
-    "timeout": 2000
+    "timeout": 200
   },
   {
     "name": "Test2",

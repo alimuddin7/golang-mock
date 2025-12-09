@@ -64,15 +64,34 @@ func (h *MockHandler) Index(c *fiber.Ctx) error {
 
 // Save ...
 func (h *MockHandler) Save(c *fiber.Ctx) error {
+	// Log the raw body for debugging
+	bodyBytes := c.Body()
+	log.Printf("Received save request, body length: %d bytes", len(bodyBytes))
+	log.Printf("Raw body preview (first 500 chars): %s", string(bodyBytes[:min(500, len(bodyBytes))]))
+
 	var newCfgs []model.MockConfig
 	if err := c.BodyParser(&newCfgs); err != nil {
-		return c.Status(400).SendString("Invalid config format")
+		log.Printf("Error parsing config: %v", err)
+		return c.Status(400).SendString("Invalid config format: " + err.Error())
 	}
+
+	log.Printf("Successfully parsed %d configurations", len(newCfgs))
+
 	if err := config.SaveConfigs(h.Path, newCfgs); err != nil {
-		return c.Status(500).SendString("Failed to save configs")
+		log.Printf("Error saving configs: %v", err)
+		return c.Status(500).SendString("Failed to save configs: " + err.Error())
 	}
+
 	h.Configs = newCfgs
+	log.Println("Configurations saved successfully")
 	return c.SendString("Config saved")
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }
 
 // Delete ...
