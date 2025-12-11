@@ -141,18 +141,5 @@
     },
     "statusCode": 200,
     "timeout": 0
-  },
-  {
-    "name": "Api Test 4 (Copy)",
-    "method": "GET",
-    "path": "/api/new/4-copy",
-    "requestHeaders": {},
-    "requestBody": {},
-    "responseHeaders": {},
-    "responseBody": {
-      "data": "ok"
-    },
-    "statusCode": 200,
-    "timeout": 0
   }
 ]
