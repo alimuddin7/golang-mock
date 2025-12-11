@@ -31,23 +31,19 @@
         </div>
         <div class="flex-none gap-2">
             <div class="badge badge-primary">v1.0.0</div>
-            <div class="dropdown dropdown-end">
-                <label tabindex="0" class="btn btn-ghost btn-circle btn-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-                    </svg>
-                </label>
-                <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-2xl bg-base-100 rounded-box w-52">
-                    <li><a onclick="setTheme('light')">🌞 Light</a></li>
-                    <li><a onclick="setTheme('dark')">🌙 Dark</a></li>
-                    <li><a onclick="setTheme('cupcake')">🧁 Cupcake</a></li>
-                    <li><a onclick="setTheme('cyberpunk')">🤖 Cyberpunk</a></li>
-                    <li><a onclick="setTheme('synthwave')">🌆 Synthwave</a></li>
-                    <li><a onclick="setTheme('forest')">🌲 Forest</a></li>
-                </ul>
-            </div>
+            <label class="swap swap-rotate">
+                <input type="checkbox" class="theme-controller" id="themeToggle" />
+                <!-- sun icon -->
+                <svg class="swap-off fill-current w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path
+                        d="M5.64,17l-.71.71a1,1,0,0,0,0,1.41,1,1,0,0,0,1.41,0l.71-.71A1,1,0,0,0,5.64,17ZM5,12a1,1,0,0,0-1-1H3a1,1,0,0,0,0,2H4A1,1,0,0,0,5,12Zm7-7a1,1,0,0,0,1-1V3a1,1,0,0,0-2,0V4A1,1,0,0,0,12,5ZM5.64,7.05a1,1,0,0,0,.7.29,1,1,0,0,0,.71-.29,1,1,0,0,0,0-1.41l-.71-.71A1,1,0,0,0,4.93,6.34Zm12,.29a1,1,0,0,0,.7-.29l.71-.71a1,1,0,1,0-1.41-1.41L17,5.64a1,1,0,0,0,0,1.41A1,1,0,0,0,17.66,7.34ZM21,11H20a1,1,0,0,0,0,2h1a1,1,0,0,0,0-2Zm-9,8a1,1,0,0,0-1,1v1a1,1,0,0,0,2,0V20A1,1,0,0,0,12,19ZM18.36,17A1,1,0,0,0,17,18.36l.71.71a1,1,0,0,0,1.41,0,1,1,0,0,0,0-1.41ZM12,6.5A5.5,5.5,0,1,0,17.5,12,5.51,5.51,0,0,0,12,6.5Zm0,9A3.5,3.5,0,1,1,15.5,12,3.5,3.5,0,0,1,12,15.5Z" />
+                </svg>
+                <!-- moon icon -->
+                <svg class="swap-on fill-current w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path
+                        d="M21.64,13a1,1,0,0,0-1.05-.14,8.05,8.05,0,0,1-3.37.73A8.15,8.15,0,0,1,9.08,5.49a8.59,8.59,0,0,1,.25-2A1,1,0,0,0,8,2.36,10.14,10.14,0,1,0,22,14.05,1,1,0,0,0,21.64,13Zm-9.5,6.69A8.14,8.14,0,0,1,7.08,5.22v.27A10.15,10.15,0,0,0,17.22,15.63a9.79,9.79,0,0,0,2.1-.22A8.11,8.11,0,0,1,12.14,19.73Z" />
+                </svg>
+            </label>
         </div>
     </div>
 
@@ -160,23 +156,34 @@
                 <ul class="menu menu-sm p-2">
                     <template x-for="(cfg, index) in filteredConfigs" :key="index">
                         <li>
-                            <a @click="selectConfig(index)" :class="{ 'active': selectedIndex === index }"
-                                class="flex items-start py-3">
-                                <div class="flex-1 min-w-0">
-                                    <div class="flex items-center gap-2 mb-1">
-                                        <div :class="{
-                                            'badge-info': cfg.method === 'GET',
-                                            'badge-success': cfg.method === 'POST',
-                                            'badge-warning': cfg.method === 'PUT',
-                                            'badge-error': cfg.method === 'DELETE'
-                                        }" class="badge badge-xs">
-                                            <span x-text="cfg.method"></span>
+                            <div class="flex items-center gap-1 group">
+                                <a @click="selectConfig(index)" :class="{ 'active': selectedIndex === index }"
+                                    class="flex items-start py-3 flex-1 min-w-0">
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center gap-2 mb-1">
+                                            <div :class="{
+                                                'badge-info': cfg.method === 'GET',
+                                                'badge-success': cfg.method === 'POST',
+                                                'badge-warning': cfg.method === 'PUT',
+                                                'badge-error': cfg.method === 'DELETE'
+                                            }" class="badge badge-xs">
+                                                <span x-text="cfg.method"></span>
+                                            </div>
+                                            <span class="font-semibold text-xs truncate" x-text="cfg.name"></span>
                                         </div>
-                                        <span class="font-semibold text-xs truncate" x-text="cfg.name"></span>
+                                        <div class="text-xs opacity-60 truncate" x-text="cfg.path"></div>
                                     </div>
-                                    <div class="text-xs opacity-60 truncate" x-text="cfg.path"></div>
-                                </div>
-                            </a>
+                                </a>
+                                <button @click.stop="duplicateConfig(index)"
+                                    class="btn btn-ghost btn-xs btn-circle opacity-0 group-hover:opacity-100 transition-opacity"
+                                    title="Duplicate configuration">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                    </svg>
+                                </button>
+                            </div>
                         </li>
                     </template>
                 </ul>
@@ -336,13 +343,20 @@
 
     <script src="https://unpkg.com/alpinejs" defer></script>
     <script>
-        function setTheme(theme) {
-            document.documentElement.setAttribute('data-theme', theme);
-            localStorage.setItem('theme', theme);
-        }
-
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('themeToggle');
         const savedTheme = localStorage.getItem('theme') || 'dark';
+
+        // Set initial theme
         document.documentElement.setAttribute('data-theme', savedTheme);
+        themeToggle.checked = savedTheme === 'light';
+
+        // Toggle theme on change
+        themeToggle.addEventListener('change', function () {
+            const newTheme = this.checked ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
 
         function configManager() {
             return {
@@ -387,6 +401,53 @@
                     };
                     this.configs.push(newConfig);
                     this.selectedIndex = this.configs.length - 1;
+                },
+
+                duplicateConfig(index) {
+                    const original = this.configs[index];
+
+                    // Generate unique path by appending suffix
+                    let newPath = original.path;
+                    let suffix = 1;
+
+                    // Check if path already ends with a number pattern like -copy-1, -copy-2, etc.
+                    const copyPattern = /(-copy-?)(\d*)$/;
+                    const match = newPath.match(copyPattern);
+
+                    if (match) {
+                        // If it already has -copy suffix, increment the number
+                        const baseNumber = match[2] ? parseInt(match[2]) : 1;
+                        newPath = newPath.replace(copyPattern, `-copy-${baseNumber + 1}`);
+                    } else {
+                        // First copy, just append -copy
+                        newPath = newPath + '-copy';
+                    }
+
+                    // Ensure the new path is truly unique
+                    while (this.configs.some(cfg => cfg.path === newPath && cfg.method === original.method)) {
+                        suffix++;
+                        if (match) {
+                            const baseNumber = match[2] ? parseInt(match[2]) : 1;
+                            newPath = original.path.replace(copyPattern, `-copy-${baseNumber + suffix}`);
+                        } else {
+                            newPath = original.path + `-copy-${suffix}`;
+                        }
+                    }
+
+                    const duplicate = {
+                        name: original.name + ' (Copy)',
+                        method: original.method,
+                        path: newPath,
+                        statusCode: original.statusCode,
+                        timeout: original.timeout,
+                        requestHeaders: original.requestHeaders,
+                        requestBody: original.requestBody,
+                        responseHeaders: original.responseHeaders,
+                        responseBody: original.responseBody
+                    };
+                    this.configs.push(duplicate);
+                    this.selectedIndex = this.configs.length - 1;
+                    this.showSidebar = false; // Close sidebar on mobile after duplication
                 },
 
                 deleteCurrentConfig() {
