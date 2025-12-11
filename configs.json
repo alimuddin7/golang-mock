@@ -76,7 +76,7 @@
     "timeout": 0
   },
   {
-    "name": "Path params",
+    "name": "Path params coba aja banyakin ahhh",
     "method": "GET",
     "path": "/api/test/:id/:data",
     "requestHeaders": {},

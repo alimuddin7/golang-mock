@@ -169,9 +169,13 @@
                                             }" class="badge badge-xs">
                                                 <span x-text="cfg.method"></span>
                                             </div>
-                                            <span class="font-semibold text-xs truncate" x-text="cfg.name"></span>
+                                            <span class="font-semibold text-xs"
+                                                x-text="cfg.name.length > 30 ? cfg.name.substring(0, 30) + '...' : cfg.name"
+                                                :title="cfg.name"></span>
                                         </div>
-                                        <div class="text-xs opacity-60 truncate" x-text="cfg.path"></div>
+                                        <div class="text-xs opacity-60"
+                                            x-text="cfg.path.length > 30 ? cfg.path.substring(0, 30) + '...' : cfg.path"
+                                            :title="cfg.path"></div>
                                     </div>
                                 </a>
                                 <button @click.stop="duplicateConfig(index)"
