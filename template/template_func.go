@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"html/template"
 
-	"golang-mock/model"
+	"gopher-mock/model"
 )
 
 // ToJSONPretty ...

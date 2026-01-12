@@ -7,8 +7,8 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/template/html/v2"
 
-	"golang-mock/handler"
-	"golang-mock/template"
+	"gopher-mock/handler"
+	"gopher-mock/template"
 )
 
 func main() {
@@ -26,6 +26,7 @@ func main() {
 	app.Use(compress.New(compress.Config{
 		Level: compress.LevelBestSpeed,
 	}))
+	app.Static("/static", "./static")
 	app.Get("/", h.Index)
 	app.Post("/save", h.Save)
 	app.Post("/import-openapi", h.ImportOpenAPI)

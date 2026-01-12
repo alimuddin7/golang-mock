@@ -8,7 +8,7 @@ import (
 	"github.com/getkin/kin-openapi/openapi3"
 	"gopkg.in/yaml.v3"
 
-	"golang-mock/model"
+	"gopher-mock/model"
 )
 
 // ParseOpenAPISpec parses an OpenAPI specification (JSON or YAML) and converts it to mock configurations

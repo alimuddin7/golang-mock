@@ -6,7 +6,7 @@ import (
 	"strings"
 	"sync"
 
-	"golang-mock/model"
+	"gopher-mock/model"
 )
 
 // RequestContext holds the request data for rule evaluation

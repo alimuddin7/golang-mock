@@ -1,407 +1,355 @@
 <!-- Right Panel -->
-<div class="flex-1 overflow-y-auto">
+<div class="flex-1 overflow-y-auto custom-scrollbar bg-base-100">
     <template x-if="selectedConfig">
-        <div class="p-6 max-w-5xl mx-auto">
-            <div class="flex items-center justify-between mb-6">
-                <div class="flex items-center gap-3">
-                    <div :class="{
-                        'badge-info': selectedConfig.method === 'GET',
-                        'badge-success': selectedConfig.method === 'POST',
-                        'badge-warning': selectedConfig.method === 'PUT',
-                        'badge-error': selectedConfig.method === 'DELETE'
-                    }" class="badge badge-lg">
-                        <span x-text="selectedConfig.method"></span>
+        <div class="p-4 md:p-8 pt-4 md:pt-10 max-w-6xl mx-auto animation-fade-in">
+            <!-- Sturdy Header -->
+            <div
+                class="flex flex-col md:flex-row items-center justify-between mb-6 md:mb-8 gap-4 md:gap-6 pb-6 border-b-4 border-base-content">
+                <div class="flex items-center gap-5">
+                    <div class="relative group/method">
+                        <select x-model="configs[selectedIndex].method" :class="{
+                                'bg-info text-info-content focus:ring-info/30': configs[selectedIndex].method === 'GET',
+                                'bg-success text-success-content focus:ring-success/30': configs[selectedIndex].method === 'POST',
+                                'bg-warning text-warning-content focus:ring-warning/30': configs[selectedIndex].method === 'PUT',
+                                'bg-error text-error-content focus:ring-error/30': configs[selectedIndex].method === 'DELETE'
+                            }"
+                            class="appearance-none select select-sm rounded-lg font-medium font-mono text-xs border-2 border-base-content uppercase pr-8 focus:outline-none focus:ring-4 transition-all cursor-pointer">
+                            <option value="GET">GET</option>
+                            <option value="POST">POST</option>
+                            <option value="PUT">PUT</option>
+                            <option value="DELETE">DELETE</option>
+                            <option value="PATCH">PATCH</option>
+                            <option value="OPTIONS">OPTIONS</option>
+                            <option value="HEAD">HEAD</option>
+                        </select>
+                        <div
+                            class="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none opacity-50 group-hover/method:opacity-100 transition-opacity">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="4"
+                                    d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </div>
                     </div>
-                    <h2 class="text-2xl font-bold">Configuration Details</h2>
+                    <div class="flex flex-col flex-1 min-w-0">
+                        <input type="text" x-model="configs[selectedIndex].name"
+                            class="text-3xl font-medium tracking-tighter uppercase bg-transparent border-none focus:outline-none focus:ring-2 focus:ring-primary/20 rounded-lg w-full p-1 -ml-1 transition-all"
+                            placeholder="Mock Name" />
+                        <div class="flex items-center gap-2 mt-1">
+                            <div
+                                class="flex items-center gap-2 bg-neutral text-neutral-content px-3 py-1 rounded-xl border-2 border-base-content font-mono text-[11px] font-medium flex-1 md:flex-none max-w-md">
+                                <span class="opacity-40 select-none">PATH:</span>
+                                <input type="text" x-model="configs[selectedIndex].path"
+                                    class="bg-transparent border-none focus:outline-none p-0 h-auto w-full text-neutral-content"
+                                    placeholder="/api/example" />
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <button @click="deleteCurrentConfig()" class="btn btn-error btn-sm gap-2">
+                <button @click="deleteCurrentConfig()"
+                    class="btn btn-error btn-sm rounded-lg gap-2 font-medium uppercase tracking-widest px-6 border-2 border-base-content transition-all">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                             d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
-                    Delete
+                    Delete Mock
                 </button>
             </div>
 
-            <div class="bg-base-100 rounded-lg p-6 shadow-lg space-y-4">
-                <div class="grid gap-1">
-                    <label class="label"><span class="text-sm font-medium font-semibold">Name</span></label>
-                    <input type="text" x-model="selectedConfig.name" class="input input-bordered w-full" />
+            <!-- Sturdy Tabs Interface -->
+            <div class="mb-10">
+                <div
+                    class="tabs tabs-boxed bg-base-200 p-1.5 rounded-xl border-2 border-base-content/10 inline-flex shadow-inner">
+                    <a class="tab tab-sm font-medium uppercase tracking-widest text-[10px] rounded-lg transition-all px-6 h-8"
+                        :class="activeTab === 'conditionalResponses' ? 'tab-active bg-primary text-primary-content border-2 border-base-content' : 'hover:bg-base-300'"
+                        @click="activeTab = 'conditionalResponses'">Rules</a>
+                    <a class="tab tab-sm font-medium uppercase tracking-widest text-[10px] rounded-lg transition-all px-6 h-8"
+                        :class="activeTab === 'legacy' ? 'tab-active bg-primary text-primary-content border-2 border-base-content' : 'hover:bg-base-300'"
+                        @click="activeTab = 'legacy'">Default Response</a>
                 </div>
+            </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="grid gap-1">
-                        <label class="label"><span class="text-sm font-medium font-semibold">Method</span></label>
-                        <select x-model="selectedConfig.method" class="select select-bordered">
-                            {{ range httpMethods }}
-                            <option value="{{ . }}">{{ . }}</option>
-                            {{ end }}
-                        </select>
+            <!-- Rules Section -->
+            <div x-show="activeTab === 'conditionalResponses'" class="space-y-8 animation-fade-in">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex flex-col">
+                        <h3 class="text-xl font-medium tracking-tight uppercase">Conditional Rules</h3>
+                        <p class="text-[10px] font-medium opacity-30 tracking-[0.2em] uppercase mt-0.5">Custom Response
+                            Logic</p>
                     </div>
-                    <div class="grid gap-1">
-                        <label class="label"><span class="text-sm font-medium font-semibold">Status
-                                Code</span></label>
-                        <input type="number" x-model="selectedConfig.statusCode" class="input input-bordered" />
-                    </div>
-                    <div class="grid gap-1">
-                        <label class="label"><span class="text-sm font-medium font-semibold">Timeout
-                                (ms)</span></label>
-                        <input type="number" x-model="selectedConfig.timeout" class="input input-bordered" />
-                    </div>
-                </div>
-
-                <div class="grid gap-1">
-                    <label class="label"><span class="text-sm font-medium font-semibold">Path</span></label>
-                    <input type="text" x-model="selectedConfig.path" class="input input-bordered w-full" />
-                </div>
-
-
-                <div role="tablist" class="tabs tabs-box bg-base-200">
-                    <button role="tab" class="tab gap-2 transition-all duration-200"
-                        :class="{ 'tab-active bg-primary text-primary-content': activeTab === 'conditionalResponses' }"
-                        @click="activeTab = 'conditionalResponses'">
+                    <button @click="addConditionalResponse()"
+                        class="btn btn-success btn-sm rounded-lg gap-2 font-medium uppercase tracking-widest text-[10px] border-2 border-base-content transition-all">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4" />
                         </svg>
-                        <span>Conditional Rules</span>
-                        <div class="badge badge-sm"
-                            :class="activeTab === 'conditionalResponses' ? 'badge-ghost opacity-80' : 'badge-neutral'"
-                            x-text="selectedConfig.responses.length"></div>
-                    </button>
-                    <button role="tab" class="tab gap-2 transition-all duration-200"
-                        :class="{ 'tab-active bg-primary text-primary-content': activeTab === 'legacyMode' }"
-                        @click="activeTab = 'legacyMode'">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        <span>Legacy Mode</span>
+                        Add New Rule
                     </button>
                 </div>
 
-                <!-- Conditional Responses Tab -->
-                <div x-show="activeTab === 'conditionalResponses'" class="space-y-4 mt-4">
-                    <div class="alert alert-info">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                            class="stroke-current shrink-0 w-6 h-6">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        <span>Create multiple responses with conditions. Responses are evaluated in order until
-                            a match is found.</span>
-                    </div>
+                <div class="space-y-6">
+                    <template x-for="(resp, idx) in selectedConfig.responses || []" :key="idx">
+                        <div
+                            class="bg-base-200 rounded-3xl border-2 border-base-content/10 overflow-hidden shadow-sm hover:border-primary/30 transition-colors group/card">
+                            <!-- Rule Header -->
+                            <div
+                                class="p-4 md:p-5 border-b-2 border-base-content/5 flex flex-col md:flex-row items-start md:items-center justify-between bg-base-100 gap-4">
+                                <div class="flex flex-col md:flex-row items-start md:items-center gap-4 flex-1 w-full">
+                                    <div class="flex flex-col gap-1 w-full md:max-w-md">
+                                        <label
+                                            class="text-[9px] font-medium uppercase tracking-widest opacity-40 px-1">Rule
+                                            Name</label>
+                                        <input type="text" x-model="resp.name"
+                                            class="input input-sm border-2 border-base-content/10 bg-base-200/50 focus:bg-base-100 rounded-lg font-medium w-full focus:border-primary/50" />
+                                    </div>
+                                    <div class="flex flex-col gap-1 w-full md:w-auto">
+                                        <label
+                                            class="text-[9px] font-medium uppercase tracking-widest opacity-40 px-1">Condition</label>
+                                        <select x-model="resp.ruleOperator"
+                                            class="select select-sm select-bordered border-2 border-base-content/10 bg-base-200/50 rounded-lg font-medium focus:border-primary/50 h-8 min-h-0 text-[10px] w-full">
+                                            <option value="AND">ALL (AND)</option>
+                                            <option value="OR">ANY (OR)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <button @click="deleteConditionalResponse(idx)"
+                                    class="btn btn-ghost btn-sm btn-square text-error hover:bg-error/10 hover:border-error/20 rounded-xl">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
+                            </div>
 
-                    <!-- Conditional Responses List -->
-                    <div class="space-y-3">
-                        <div class="flex justify-between items-center">
-                            <h3 class="font-semibold text-lg">Response Rules</h3>
-                            <button @click="addConditionalResponse()" class="btn btn-primary btn-sm gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 4v16m8-8H4" />
-                                </svg>
-                                Add Response
-                            </button>
-                        </div>
-
-                        <template x-for="(resp, respIdx) in selectedConfig.responses" :key="respIdx">
-                            <div class="card bg-base-200 shadow-md">
-                                <div class="card-body p-4">
-                                    <!-- Response Header -->
-                                    <div class="flex justify-between items-start mb-3">
-                                        <div class="flex-1 mr-2">
-                                            <input type="text" x-model="resp.name"
-                                                placeholder="Response name (e.g., 'Amount Too Large')"
-                                                class="input input-sm input-bordered w-full font-semibold" />
-                                        </div>
-                                        <div class="badge badge-neutral" x-text="`Priority: ${respIdx + 1}`">
-                                        </div>
-                                        <button @click="deleteConditionalResponse(respIdx)"
-                                            class="btn btn-error btn-xs btn-circle ml-2">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                            <div class="p-6 space-y-8">
+                                <!-- Rules Builder -->
+                                <div class="space-y-4">
+                                    <div class="flex items-center justify-between">
+                                        <label
+                                            class="text-[10px] font-medium uppercase tracking-widest text-primary flex items-center gap-2">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none"
                                                 viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M6 18L18 6M6 6l12 12" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                                    d="M13 10V3L4 14h7v7l9-11h-7z" />
                                             </svg>
+                                            Matching Rules
+                                        </label>
+                                        <button @click="addRule(idx)"
+                                            class="btn btn-xs btn-ghost gap-1 font-medium uppercase tracking-widest text-[9px] hover:bg-primary/10 rounded-lg">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                                    d="M12 4v16m8-8H4" />
+                                            </svg>
+                                            Add Clause
                                         </button>
                                     </div>
-
-                                    <!-- Rules Section -->
-                                    <div class="divider my-2">Rules</div>
                                     <div class="space-y-2">
-                                        <div class="flex justify-between items-center">
-                                            <span class="text-sm font-medium">Conditions</span>
-                                            <div class="flex gap-2 items-center">
-                                                <select x-model="resp.ruleOperator"
-                                                    class="select select-xs select-bordered">
-                                                    <option value="AND">AND (All must match)</option>
-                                                    <option value="OR">OR (Any can match)</option>
+                                        <template x-for="(rule, ridx) in resp.rules || []" :key="ridx">
+                                            <div
+                                                class="flex items-center gap-2 bg-base-100 p-2 rounded-xl border-2 border-base-content/5 animation-fade-in group/rule">
+                                                <select x-model="rule.target"
+                                                    class="select select-xs select-bordered bg-base-200 border-2 border-base-content/10 rounded-lg font-medium text-[10px] h-9">
+                                                    <option value="body">JSON Body</option>
+                                                    <option value="header">Header</option>
+                                                    <option value="query">Query Param</option>
                                                 </select>
-                                                <button @click="addRule(respIdx)" class="btn btn-xs btn-ghost gap-1">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none"
+                                                <input type="text" x-model="rule.field"
+                                                    placeholder="Field Path (e.g. user.id)"
+                                                    class="input input-xs border-2 border-base-content/10 bg-base-200 focus:bg-base-200 font-mono text-xs w-full rounded-lg h-9" />
+                                                <select x-model="rule.operator"
+                                                    class="select select-xs select-bordered bg-base-200 border-2 border-base-content/10 rounded-lg font-medium text-[10px] h-9">
+                                                    <option value="equals">==</option>
+                                                    <option value="not_equals">!=</option>
+                                                    <option value="contains">CONTAINS</option>
+                                                    <option value="regex">REGEX</option>
+                                                </select>
+                                                <input type="text" x-model="rule.value" placeholder="Expectation"
+                                                    class="input input-xs border-2 border-base-content/10 bg-base-200 focus:bg-base-200 font-mono text-xs w-full rounded-lg h-9" />
+                                                <button @click="deleteRule(idx, ridx)"
+                                                    class="btn btn-ghost btn-xs opacity-40 group-hover/rule:opacity-100 text-error rounded-lg">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
                                                         viewBox="0 0 24 24" stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2" d="M12 4v16m8-8H4" />
+                                                            stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                                     </svg>
-                                                    Add Rule
                                                 </button>
                                             </div>
-                                        </div>
-
-                                        <template x-for="(rule, ruleIdx) in resp.rules" :key="ruleIdx">
-                                            <div class="grid grid-cols-12 gap-2 items-center bg-base-100 p-2 rounded">
-                                                <select x-model="rule.target"
-                                                    class="select select-xs select-bordered col-span-2">
-                                                    <option value="body">Body</option>
-                                                    <option value="header">Header</option>
-                                                    <option value="query">Query</option>
-                                                    <option value="path">Path</option>
-                                                </select>
-                                                <input type="text" x-model="rule.field" placeholder="field"
-                                                    class="input input-xs input-bordered col-span-3" />
-                                                <select x-model="rule.operator"
-                                                    class="select select-xs select-bordered col-span-3">
-                                                    <option value="==">== (Equals)</option>
-                                                    <option value="!=">!= (Not Equals)</option>
-                                                    <option value="~">~ (Contains)</option>
-                                                    <option value=".*">.* (Regex)</option>
-                                                    <option value="?">? (Exists)</option>
-                                                    <option value=">">&gt; (Greater Than)</option>
-                                                    <option value="<">&lt; (Less Than)</option>
-                                                    <option value=">=">&gt;= (Greater or Equal)</option>
-                                                    <option value="<=">&lt;= (Less or Equal)</option>
-                                                </select>
-                                                <input type="text" x-model="rule.value" placeholder="value"
-                                                    class="input input-xs input-bordered col-span-3" />
-                                                <button @click="deleteRule(respIdx, ruleIdx)"
-                                                    class="btn btn-error btn-xs btn-circle col-span-1">×</button>
-                                            </div>
                                         </template>
-
                                         <div x-show="!resp.rules || resp.rules.length === 0"
-                                            class="text-sm opacity-60 text-center py-2">
-                                            No rules defined. This response will always match.
+                                            class="p-6 text-center border-2 border-dashed border-base-content/10 rounded-2xl opacity-30 text-[10px] font-medium uppercase tracking-widest">
+                                            No conditions defined. Always matches.
                                         </div>
                                     </div>
+                                </div>
 
-                                    <!-- Response Configuration -->
-                                    <div class="divider my-2">Response</div>
-                                    <div class="grid gap-2 mb-2">
-                                        <div class="grid grid-cols-2 gap-2">
-                                            <div class="grid gap-1">
-                                                <label class="label py-1"><span
-                                                        class="text-sm font-medium text-xs">Status
+                                <!-- Response Config -->
+                                <div
+                                    class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t-2 border-base-content/5">
+                                    <div class="space-y-4">
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <div class="w-1.5 h-6 bg-info rounded-full"></div>
+                                            <h4 class="text-[10px] font-medium uppercase tracking-widest opacity-60">
+                                                Status & Delay</h4>
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <div class="form-control">
+                                                <label class="label pt-0"><span
+                                                        class="label-text text-[9px] font-medium uppercase tracking-widest opacity-40">Status
                                                         Code</span></label>
                                                 <input type="number" x-model="resp.response.statusCode"
-                                                    class="input input-xs input-bordered w-full" />
+                                                    class="input border-2 border-base-content/10 bg-base-100 rounded-xl font-medium focus:border-info" />
                                             </div>
-                                            <div class="grid gap-1">
-                                                <label class="label py-1"><span
-                                                        class="text-sm font-medium text-xs">Timeout
-                                                        (ms)</span></label>
+                                            <div class="form-control">
+                                                <label class="label pt-0"><span
+                                                        class="label-text text-[9px] font-medium uppercase tracking-widest opacity-40">Millisecond
+                                                        Delay</span></label>
                                                 <input type="number" x-model="resp.response.timeout"
-                                                    class="input input-xs input-bordered w-full" />
+                                                    class="input border-2 border-base-content/10 bg-base-100 rounded-xl font-medium focus:border-info" />
                                             </div>
                                         </div>
-                                        <div class="grid gap-1">
-                                            <label class="label py-1">
-                                                <span class="text-sm font-medium text-xs">Response Headers
-                                                    (JSON)</span>
-                                                <button type="button"
-                                                    @click="beautifyConditionalJSON(respIdx, 'headers')"
-                                                    class="btn btn-xs btn-ghost">Beautify</button>
-                                            </label>
-                                            <textarea x-model="resp.response.headers" rows="3"
-                                                class="textarea textarea-xs textarea-bordered font-mono text-xs w-full"></textarea>
+                                        <div class="form-control group/json relative">
+                                            <div class="flex justify-between items-center mb-2">
+                                                <label class="label p-0"><span
+                                                        class="label-text text-[9px] font-medium uppercase tracking-widest opacity-40">Response
+                                                        Headers</span></label>
+                                                <button @click="beautifyConditionalJSON(idx, 'headers')"
+                                                    class="btn btn-ghost btn-xs text-[8px] font-medium uppercase tracking-widest opacity-0 group-hover/json:opacity-40 hover:opacity-100 transition-opacity">Prettify</button>
+                                            </div>
+                                            <textarea x-model="resp.response.headers"
+                                                class="textarea border-2 border-base-content/10 bg-base-100 font-mono text-[10px] h-32 rounded-2xl resize-none focus:border-info leading-relaxed"></textarea>
                                         </div>
-                                        <div class="grid gap-1">
-                                            <label class="label py-1">
-                                                <span class="text-sm font-medium text-xs">Response Body
-                                                    (JSON)</span>
-                                                <button type="button" @click="beautifyConditionalJSON(respIdx, 'body')"
-                                                    class="btn btn-xs btn-ghost">Beautify</button>
-                                            </label>
-                                            <textarea x-model="resp.response.body" rows="5"
-                                                class="textarea textarea-xs textarea-bordered font-mono text-xs w-full"></textarea>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <div class="flex justify-between items-center mb-2">
+                                            <div class="flex items-center gap-2">
+                                                <div class="w-1.5 h-6 bg-primary rounded-full"></div>
+                                                <h4
+                                                    class="text-[10px] font-medium uppercase tracking-widest opacity-60">
+                                                    JSON Response Payload</h4>
+                                            </div>
+                                            <button @click="beautifyConditionalJSON(idx, 'body')"
+                                                class="btn btn-ghost btn-xs text-[8px] font-medium uppercase tracking-widest opacity-40 hover:opacity-100">Prettify</button>
                                         </div>
+                                        <textarea x-model="resp.response.body"
+                                            class="textarea flex-1 border-2 border-base-content/10 bg-base-100 font-mono text-[10px] rounded-2xl resize-none focus:border-primary leading-relaxed p-5 h-[240px]"></textarea>
                                     </div>
                                 </div>
                             </div>
-                        </template>
-
-                        <div x-show="!selectedConfig.responses || selectedConfig.responses.length === 0"
-                            class="text-center py-8 opacity-60">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-2" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            <p>No conditional responses defined</p>
-                            <p class="text-xs mt-1">Click "Add Response" to create your first conditional
-                                response</p>
                         </div>
-                    </div>
+                    </template>
+                </div>
+            </div>
 
-                    <!-- Default Response -->
-                    <div class="divider">Default Response (Fallback)</div>
-                    <div class="card bg-base-200 shadow-md">
-                        <div class="card-body p-4">
-                            <p class="text-sm opacity-70 mb-3">This response is used when no conditional
-                                responses match</p>
-                            <div class="grid gap-2 mb-2">
-                                <div class="grid grid-cols-2 gap-2">
-                                    <div class="grid gap-1">
-                                        <label class="label py-1"><span class="text-sm font-medium text-xs">Status
+            <!-- Default Response (Legacy) Section -->
+            <div x-show="activeTab === 'legacy'" class="space-y-8 animation-fade-in">
+                <div class="flex flex-col mb-2">
+                    <h3 class="text-xl font-medium tracking-tight uppercase">Base Response</h3>
+                    <p class="text-[10px] font-medium opacity-30 tracking-[0.2em] uppercase mt-0.5">Global Fallback
+                        Settings</p>
+                </div>
+
+                <div class="bg-base-200 rounded-[2.5rem] border-2 border-base-content/10 overflow-hidden shadow-sm">
+                    <div class="p-8 space-y-8">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                            <!-- Basic Params -->
+                            <div class="space-y-6">
+                                <div class="grid grid-cols-2 gap-6">
+                                    <div class="form-control">
+                                        <label class="label pt-0"><span
+                                                class="label-text text-[9px] font-medium uppercase tracking-widest opacity-40">Status
                                                 Code</span></label>
-                                        <input type="number" x-model="selectedConfig.defaultResponse.statusCode"
-                                            class="input input-xs input-bordered w-full" />
+                                        <input type="number" x-model="selectedConfig.statusCode"
+                                            class="input border-2 border-base-content/10 bg-base-100 rounded-2xl font-medium focus:border-primary h-12" />
                                     </div>
-                                    <div class="grid gap-1">
-                                        <label class="label py-1"><span class="text-sm font-medium text-xs">Timeout
-                                                (ms)</span></label>
-                                        <input type="number" x-model="selectedConfig.defaultResponse.timeout"
-                                            class="input input-xs input-bordered w-full" />
+                                    <div class="form-control">
+                                        <label class="label pt-0"><span
+                                                class="label-text text-[9px] font-medium uppercase tracking-widest opacity-40">Simulated
+                                                Latency (ms)</span></label>
+                                        <input type="number" x-model="selectedConfig.timeout"
+                                            class="input border-2 border-base-content/10 bg-base-100 rounded-2xl font-medium focus:border-primary h-12" />
                                     </div>
                                 </div>
-                                <div class="grid gap-1">
-                                    <label class="label py-1">
-                                        <span class="text-sm font-medium text-xs">Response Headers (JSON)</span>
-                                        <button type="button" @click="beautifyDefaultJSON('headers')"
-                                            class="btn btn-xs btn-ghost">Beautify</button>
-                                    </label>
-                                    <textarea x-model="selectedConfig.defaultResponse.headers" rows="3"
-                                        class="textarea textarea-xs textarea-bordered font-mono text-xs w-full"></textarea>
+
+                                <div class="form-control group/json relative">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <label class="label p-0"><span
+                                                class="label-text text-[9px] font-medium uppercase tracking-widest opacity-40">Response
+                                                Headers</span></label>
+                                        <button @click="beautifyJSON('responseHeaders')"
+                                            class="btn btn-ghost btn-xs text-[8px] font-medium uppercase tracking-widest opacity-40 hover:opacity-100 transition-opacity">Prettify
+                                            JSON</button>
+                                    </div>
+                                    <textarea x-model="selectedConfig.responseHeaders"
+                                        class="textarea border-2 border-base-content/10 bg-base-100 font-mono text-[10px] h-40 rounded-3xl resize-none focus:border-primary leading-relaxed p-5"></textarea>
                                 </div>
-                                <div class="grid gap-1">
-                                    <label class="label py-1">
-                                        <span class="text-sm font-medium text-xs">Response Body (JSON)</span>
-                                        <button type="button" @click="beautifyDefaultJSON('body')"
-                                            class="btn btn-xs btn-ghost">Beautify</button>
-                                    </label>
-                                    <textarea x-model="selectedConfig.defaultResponse.body" rows="5"
-                                        class="textarea textarea-xs textarea-bordered font-mono text-xs w-full"></textarea>
+                            </div>
+
+                            <!-- Payload -->
+                            <div class="flex flex-col h-full">
+                                <div class="flex justify-between items-center mb-2">
+                                    <label class="label p-0"><span
+                                            class="label-text text-[9px] font-medium uppercase tracking-widest opacity-40">Response
+                                            Payload</span></label>
+                                    <button @click="beautifyJSON('responseBody')"
+                                        class="btn btn-ghost btn-xs text-[8px] font-medium uppercase tracking-widest opacity-40 hover:opacity-100">Prettify
+                                        Payload</button>
+                                </div>
+                                <textarea x-model="selectedConfig.responseBody"
+                                    class="textarea flex-1 border-2 border-base-content/10 bg-base-100 font-mono text-[11px] rounded-[2rem] resize-none focus:border-primary leading-relaxed p-6 h-[320px]"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Requirements Accordion -->
+                        <div
+                            class="collapse collapse-plus bg-base-100 rounded-[2rem] border-2 border-base-content/5 overflow-hidden">
+                            <input type="checkbox" />
+                            <div
+                                class="collapse-title text-xs font-medium uppercase tracking-[0.2em] opacity-40 pl-8 h-14 flex items-center">
+                                Optional Request Validation
+                            </div>
+                            <div class="collapse-content px-8 pb-8">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
+                                    <div class="form-control">
+                                        <div class="flex justify-between items-center mb-2">
+                                            <span
+                                                class="text-[9px] font-medium uppercase tracking-widest opacity-40">Required
+                                                Req. Headers</span>
+                                            <button @click="beautifyJSON('requestHeaders')"
+                                                class="btn btn-ghost btn-xs text-[8px] font-medium uppercase">Prettify</button>
+                                        </div>
+                                        <textarea x-model="selectedConfig.requestHeaders"
+                                            class="textarea border-2 border-base-content/10 bg-base-200 font-mono text-[10px] h-32 rounded-2xl resize-none focus:border-primary"></textarea>
+                                    </div>
+                                    <div class="form-control">
+                                        <div class="flex justify-between items-center mb-2">
+                                            <span
+                                                class="text-[9px] font-medium uppercase tracking-widest opacity-40">Required
+                                                Req. Body</span>
+                                            <button @click="beautifyJSON('requestBody')"
+                                                class="btn btn-ghost btn-xs text-[8px] font-medium uppercase">Prettify</button>
+                                        </div>
+                                        <textarea x-model="selectedConfig.requestBody"
+                                            class="textarea border-2 border-base-content/10 bg-base-200 font-mono text-[10px] h-32 rounded-2xl resize-none focus:border-primary"></textarea>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <!-- Legacy Mode Tab -->
-                <div x-show="activeTab === 'legacyMode'" class="space-y-4 mt-4">
-                    <div class="alert alert-warning">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 w-6 h-6" fill="none"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                        </svg>
-                        <span>Legacy mode: Simple request/response without conditions. Use Conditional Responses
-                            for advanced logic.</span>
-                    </div>
-
-                    <div role="tablist" class="tabs tabs-bordered">
-                        <button role="tab" class="tab tab-sm gap-1"
-                            :class="{ 'tab-active border-primary text-primary': legacyTab === 'requestHeaders' }"
-                            @click="legacyTab = 'requestHeaders'">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
-                            </svg>
-                            Headers
-                        </button>
-                        <button role="tab" class="tab tab-sm gap-1"
-                            :class="{ 'tab-active border-primary text-primary': legacyTab === 'requestBody' }"
-                            @click="legacyTab = 'requestBody'">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M4 6h16M4 12h16m-7 6h7" />
-                            </svg>
-                            Body
-                        </button>
-                        <button role="tab" class="tab tab-sm gap-1"
-                            :class="{ 'tab-active border-primary text-primary': legacyTab === 'responseHeaders' }"
-                            @click="legacyTab = 'responseHeaders'">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                            </svg>
-                            Res. Headers
-                        </button>
-                        <button role="tab" class="tab tab-sm gap-1"
-                            :class="{ 'tab-active border-primary text-primary': legacyTab === 'responseBody' }"
-                            @click="legacyTab = 'responseBody'">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                            </svg>
-                            Res. Body
-                        </button>
-                    </div>
-
-                    <div x-show="legacyTab === 'requestHeaders'" class="grid gap-2">
-                        <div class="flex justify-between items-center">
-                            <label class="text-sm font-medium font-semibold">Request Headers (JSON)</label>
-                            <button type="button" @click="beautifyJSON('requestHeaders')"
-                                class="btn btn-xs btn-ghost">Beautify</button>
-                        </div>
-                        <textarea x-model="selectedConfig.requestHeaders" rows="8"
-                            class="textarea textarea-bordered font-mono text-sm w-full"></textarea>
-                    </div>
-
-                    <div x-show="legacyTab === 'requestBody'" class="grid gap-2">
-                        <div class="flex justify-between items-center">
-                            <label class="text-sm font-medium font-semibold">Request Body (JSON)</label>
-                            <button type="button" @click="beautifyJSON('requestBody')"
-                                class="btn btn-xs btn-ghost">Beautify</button>
-                        </div>
-                        <textarea x-model="selectedConfig.requestBody" rows="8"
-                            class="textarea textarea-bordered font-mono text-sm w-full"></textarea>
-                    </div>
-
-                    <div x-show="legacyTab === 'responseHeaders'" class="grid gap-2">
-                        <div class="flex justify-between items-center">
-                            <label class="text-sm font-medium font-semibold">Response Headers (JSON)</label>
-                            <button type="button" @click="beautifyJSON('responseHeaders')"
-                                class="btn btn-xs btn-ghost">Beautify</button>
-                        </div>
-                        <textarea x-model="selectedConfig.responseHeaders" rows="8"
-                            class="textarea textarea-bordered font-mono text-sm w-full"></textarea>
-                    </div>
-
-                    <div x-show="legacyTab === 'responseBody'" class="grid gap-2">
-                        <div class="flex justify-between items-center">
-                            <label class="text-sm font-medium font-semibold">Response Body (JSON)</label>
-                            <button type="button" @click="beautifyJSON('responseBody')"
-                                class="btn btn-xs btn-ghost">Beautify</button>
-                        </div>
-                        <textarea x-model="selectedConfig.responseBody" rows="8"
-                            class="textarea textarea-bordered font-mono text-sm w-full"></textarea>
-                    </div>
-                </div>
-
             </div>
         </div>
     </template>
 
+    <!-- Empty State -->
     <template x-if="!selectedConfig">
-        <div class="flex items-center justify-center h-full">
-            <div class="text-center opacity-50">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 mx-auto mb-4" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                <p class="text-lg">Select a configuration to edit</p>
-                <p class="text-sm mt-2">or create a new one using the + button</p>
-            </div>
+        <div class="h-full flex flex-col items-center justify-center p-10 opacity-20 select-none grayscale">
+            <img src="/static/logo.png" class="w-32 h-32 mb-8 opacity-40 animate-pulse brightness-0 invert"
+                alt="Logo" />
+            <h3 class="text-4xl font-medium uppercase tracking-tighter">GopherMock</h3>
+            <p class="text-xs font-medium tracking-[0.4em] uppercase mt-2">Pick a Mock to Start Tuning</p>
         </div>
     </template>
 </div>

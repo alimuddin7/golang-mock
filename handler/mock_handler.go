@@ -13,9 +13,9 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog"
 
-	"golang-mock/config"
-	"golang-mock/model"
-	"golang-mock/service"
+	"gopher-mock/config"
+	"gopher-mock/model"
+	"gopher-mock/service"
 )
 
 // MockHandler ...

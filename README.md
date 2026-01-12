@@ -41,8 +41,8 @@
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/alimuddin7/golang-mock.git
-   cd golang-mock
+   git clone https://github.com/alimuddin7/gopher-mock.git
+   cd gopher-mock
    ```
 
 2. **Install dependencies**:

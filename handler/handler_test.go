@@ -5,7 +5,7 @@ import (
 	"sync"
 	"testing"
 
-	"golang-mock/model"
+	"gopher-mock/model"
 
 	"github.com/gofiber/fiber/v2"
 )

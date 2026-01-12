@@ -1,4 +1,4 @@
-module golang-mock
+module gopher-mock
 
 go 1.22.5
 

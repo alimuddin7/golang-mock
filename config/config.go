@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"os"
 
-	"golang-mock/model"
+	"gopher-mock/model"
 )
 
 // LoadConfigs ...
