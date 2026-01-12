@@ -1,0 +1,489 @@
+[
+  {
+    "name": "test",
+    "method": "POST",
+    "path": "/api/test",
+    "requestHeaders": {},
+    "requestBody": {},
+    "responseHeaders": {},
+    "responseBody": {},
+    "statusCode": 200,
+    "timeout": 200,
+    "defaultResponse": {
+      "headers": {},
+      "body": {},
+      "statusCode": 200,
+      "timeout": 0
+    }
+  },
+  {
+    "name": "Test2",
+    "method": "POST",
+    "path": "/api/test_2",
+    "requestHeaders": {},
+    "requestBody": {
+      "data": "abc"
+    },
+    "responseHeaders": {},
+    "responseBody": {
+      "data": true
+    },
+    "statusCode": 200,
+    "timeout": 0,
+    "responses": [
+      {
+        "name": "False Response",
+        "rules": [
+          {
+            "target": "body",
+            "field": "data",
+            "operator": "!=",
+            "value": "abc"
+          }
+        ],
+        "ruleOperator": "AND",
+        "response": {
+          "headers": {},
+          "body": {
+            "data": false,
+            "email": "{{faker.email}}",
+            "error": "{{body.data}}",
+            "name": "{{faker.name}}"
+          },
+          "statusCode": 200,
+          "timeout": 200
+        }
+      }
+    ],
+    "defaultResponse": {
+      "headers": {},
+      "body": {
+        "data": true
+      },
+      "statusCode": 200,
+      "timeout": 0
+    }
+  },
+  {
+    "name": "Path params coba aja banyakin ahhh",
+    "method": "GET",
+    "path": "/api/test/:id/:data",
+    "requestHeaders": {},
+    "requestBody": {},
+    "responseHeaders": {},
+    "responseBody": {
+      "data": "{{path.data}}",
+      "id": "{{path.id}}"
+    },
+    "statusCode": 200,
+    "timeout": 0,
+    "defaultResponse": {
+      "headers": {},
+      "body": {},
+      "statusCode": 200,
+      "timeout": 0
+    }
+  },
+  {
+    "name": "Get",
+    "method": "GET",
+    "path": "/api/test",
+    "requestHeaders": {},
+    "requestBody": {},
+    "responseHeaders": {},
+    "responseBody": {
+      "AdditionalData": "",
+      "CompanyCode": "{{body.CompanyCode}}",
+      "CurrencyCode": "IDR",
+      "CustomerName": "Gandhi Wibowo",
+      "CustomerNumber": "{{body.CustomerNumber}}",
+      "DetailBills": [],
+      "FreeText": [],
+      "InquiryReason": {
+        "english": "Success",
+        "indonesian": "Sukses"
+      },
+      "InquiryStatus": "00",
+      "RequestID": "{{body.RequestID}}",
+      "SubCompany": "00000",
+      "TotalAmount": "0.00"
+    },
+    "statusCode": 200,
+    "timeout": 0,
+    "defaultResponse": {
+      "headers": {},
+      "body": {},
+      "statusCode": 200,
+      "timeout": 0
+    }
+  },
+  {
+    "name": "Test 3",
+    "method": "GET",
+    "path": "/api/new3",
+    "requestHeaders": {},
+    "requestBody": {},
+    "responseHeaders": {},
+    "responseBody": {
+      "data": "success"
+    },
+    "statusCode": 200,
+    "timeout": 0,
+    "defaultResponse": {
+      "headers": {},
+      "body": {},
+      "statusCode": 200,
+      "timeout": 0
+    }
+  },
+  {
+    "name": "Api Test 4",
+    "method": "GET",
+    "path": "/api/new/4",
+    "requestHeaders": {},
+    "requestBody": {},
+    "responseHeaders": {},
+    "responseBody": {
+      "data": "ok"
+    },
+    "statusCode": 200,
+    "timeout": 0,
+    "defaultResponse": {
+      "headers": {},
+      "body": {},
+      "statusCode": 200,
+      "timeout": 0
+    }
+  },
+  {
+    "name": "Get current user's cart [GET cart]",
+    "method": "GET",
+    "path": "/cart",
+    "requestHeaders": {},
+    "requestBody": {},
+    "responseHeaders": {},
+    "responseBody": {},
+    "statusCode": 200,
+    "timeout": 0,
+    "defaultResponse": {
+      "headers": {},
+      "body": {
+        "items": [
+          {
+            "product_id": "{{faker.uuid}}",
+            "quantity": 0
+          }
+        ]
+      },
+      "statusCode": 200,
+      "timeout": 0
+    }
+  },
+  {
+    "name": "Add item to cart [POST items]",
+    "method": "POST",
+    "path": "/cart/items",
+    "requestHeaders": {},
+    "requestBody": {
+      "product_id": "{{faker.uuid}}",
+      "quantity": 0
+    },
+    "responseHeaders": {},
+    "responseBody": {},
+    "statusCode": 200,
+    "timeout": 0,
+    "defaultResponse": {
+      "headers": {},
+      "body": {
+        "description": "Item added to cart"
+      },
+      "statusCode": 200,
+      "timeout": 0
+    }
+  },
+  {
+    "name": "List all products with filters [GET products]",
+    "method": "GET",
+    "path": "/products",
+    "requestHeaders": {},
+    "requestBody": {},
+    "responseHeaders": {},
+    "responseBody": {},
+    "statusCode": 200,
+    "timeout": 0,
+    "defaultResponse": {
+      "headers": {},
+      "body": {
+        "items": [
+          {
+            "category": "wrong",
+            "created_at": "{{faker.date}}",
+            "description": "Mr street sell would civil. People through shake southern force.",
+            "id": "eda5cbc1-a615-4da5-ae73-4a33a9acfb6a",
+            "image_url": "https://dummyimage.com/766x809",
+            "name": "Worry Management",
+            "price": 91.37,
+            "stock": 94,
+            "updated_at": "{{faker.date}}"
+          }
+        ]
+      },
+      "statusCode": 200,
+      "timeout": 0
+    }
+  },
+  {
+    "name": "List your past orders [GET orders]",
+    "method": "GET",
+    "path": "/orders",
+    "requestHeaders": {},
+    "requestBody": {},
+    "responseHeaders": {},
+    "responseBody": {},
+    "statusCode": 200,
+    "timeout": 0,
+    "defaultResponse": {
+      "headers": {},
+      "body": {
+        "items": [
+          {
+            "created_at": "{{faker.date}}",
+            "id": "{{faker.uuid}}",
+            "items": [
+              {
+                "product_id": "{{faker.uuid}}",
+                "quantity": 0
+              }
+            ],
+            "status": "{{faker.name}}",
+            "total_amount": 0
+          }
+        ]
+      },
+      "statusCode": 200,
+      "timeout": 0
+    }
+  },
+  {
+    "name": "Get order details [GET orders]",
+    "method": "GET",
+    "path": "/orders/:orderId",
+    "requestHeaders": {},
+    "requestBody": {},
+    "responseHeaders": {},
+    "responseBody": {},
+    "statusCode": 200,
+    "timeout": 0,
+    "defaultResponse": {
+      "headers": {},
+      "body": {
+        "created_at": "{{faker.date}}",
+        "id": "{{faker.uuid}}",
+        "items": [
+          {
+            "product_id": "{{faker.uuid}}",
+            "quantity": 0
+          }
+        ],
+        "status": "{{faker.name}}",
+        "total_amount": 0
+      },
+      "statusCode": 200,
+      "timeout": 0
+    }
+  },
+  {
+    "name": "Login and get access token [POST login]",
+    "method": "POST",
+    "path": "/auth/login",
+    "requestHeaders": {},
+    "requestBody": {
+      "email": "{{faker.name}}",
+      "password": "{{faker.name}}"
+    },
+    "responseHeaders": {},
+    "responseBody": {},
+    "statusCode": 200,
+    "timeout": 0,
+    "responses": [
+      {
+        "name": "Unauthorized - Unauthorized",
+        "rules": [],
+        "ruleOperator": "AND",
+        "response": {
+          "headers": {},
+          "body": {
+            "description": "Unauthorized"
+          },
+          "statusCode": 401,
+          "timeout": 0
+        }
+      }
+    ],
+    "defaultResponse": {
+      "headers": {},
+      "body": {
+        "description": "Authenticated successfully"
+      },
+      "statusCode": 200,
+      "timeout": 0
+    }
+  },
+  {
+    "name": "Create a new user account [POST register]",
+    "method": "POST",
+    "path": "/auth/register",
+    "requestHeaders": {},
+    "requestBody": {
+      "email": "{{faker.email}}",
+      "name": "{{faker.name}}",
+      "password": "{{faker.name}}"
+    },
+    "responseHeaders": {},
+    "responseBody": {},
+    "statusCode": 200,
+    "timeout": 0,
+    "responses": [
+      {
+        "name": "Bad Request - Invalid input",
+        "rules": [
+          {
+            "target": "body",
+            "field": "name",
+            "operator": "equals",
+            "value": "agil"
+          }
+        ],
+        "ruleOperator": "AND",
+        "response": {
+          "headers": {},
+          "body": {
+            "description": "Invalid input"
+          },
+          "statusCode": 400,
+          "timeout": 0
+        }
+      }
+    ],
+    "defaultResponse": {
+      "headers": {},
+      "body": {
+        "description": "User created"
+      },
+      "statusCode": 201,
+      "timeout": 0
+    }
+  },
+  {
+    "name": "Checkout and place order [POST checkout]",
+    "method": "POST",
+    "path": "/checkout",
+    "requestHeaders": {},
+    "requestBody": {
+      "address_id": "{{faker.name}}",
+      "payment_method_id": "{{faker.name}}"
+    },
+    "responseHeaders": {},
+    "responseBody": {},
+    "statusCode": 200,
+    "timeout": 0,
+    "defaultResponse": {
+      "headers": {},
+      "body": {
+        "created_at": "{{faker.date}}",
+        "id": "{{faker.uuid}}",
+        "items": [
+          {
+            "product_id": "{{faker.uuid}}",
+            "quantity": 0
+          }
+        ],
+        "status": "{{faker.name}}",
+        "total_amount": 0
+      },
+      "statusCode": 201,
+      "timeout": 0
+    }
+  },
+  {
+    "name": "Get product details by ID [GET products]",
+    "method": "GET",
+    "path": "/products/:id",
+    "requestHeaders": {},
+    "requestBody": {},
+    "responseHeaders": {},
+    "responseBody": {},
+    "statusCode": 200,
+    "timeout": 0,
+    "defaultResponse": {
+      "headers": {},
+      "body": {
+        "category": "wrong",
+        "created_at": "{{faker.date}}",
+        "description": "Mr street sell would civil. People through shake southern force.",
+        "id": "eda5cbc1-a615-4da5-ae73-4a33a9acfb6a",
+        "image_url": "https://dummyimage.com/766x809",
+        "name": "Worry Management",
+        "price": 91.37,
+        "stock": 94,
+        "updated_at": "{{faker.date}}"
+      },
+      "statusCode": 200,
+      "timeout": 0
+    }
+  },
+  {
+    "name": "Get your saved addresses [GET addresses]",
+    "method": "GET",
+    "path": "/addresses",
+    "requestHeaders": {},
+    "requestBody": {},
+    "responseHeaders": {},
+    "responseBody": {},
+    "statusCode": 200,
+    "timeout": 0,
+    "defaultResponse": {
+      "headers": {},
+      "body": {
+        "items": [
+          {
+            "city": "{{faker.name}}",
+            "country": "{{faker.name}}",
+            "line1": "{{faker.name}}",
+            "line2": "{{faker.name}}",
+            "postal_code": "{{faker.name}}",
+            "state": "{{faker.name}}"
+          }
+        ]
+      },
+      "statusCode": 200,
+      "timeout": 0
+    }
+  },
+  {
+    "name": "Add a new address [POST addresses]",
+    "method": "POST",
+    "path": "/addresses",
+    "requestHeaders": {},
+    "requestBody": {
+      "city": "{{faker.name}}",
+      "country": "{{faker.name}}",
+      "line1": "{{faker.name}}",
+      "line2": "{{faker.name}}",
+      "postal_code": "{{faker.name}}",
+      "state": "{{faker.name}}"
+    },
+    "responseHeaders": {},
+    "responseBody": {},
+    "statusCode": 200,
+    "timeout": 0,
+    "defaultResponse": {
+      "headers": {},
+      "body": {
+        "description": "Address added"
+      },
+      "statusCode": 201,
+      "timeout": 0
+    }
+  }
+]

@@ -1,0 +1,133 @@
+<!-- Success Modal -->
+<dialog id="success_modal" class="modal">
+    <div class="modal-box">
+        <h3 class="font-bold text-lg">✅ Success!</h3>
+        <p class="py-4" x-text="modalMessage"></p>
+        <div class="modal-action">
+            <form method="dialog">
+                <button class="btn btn-primary">OK</button>
+            </form>
+        </div>
+    </div>
+</dialog>
+
+<!-- Delete Confirmation Modal -->
+<dialog id="delete_modal" class="modal">
+    <div class="modal-box">
+        <h3 class="font-bold text-lg text-error">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <span x-text="isBulkDelete ? 'Bulk Delete' : 'Delete Configuration'"></span>
+        </h3>
+        <p class="py-4" x-show="!isBulkDelete">Are you sure you want to delete this configuration?</p>
+        <p class="py-4" x-show="isBulkDelete">Are you sure you want to delete <span class="font-bold"
+                x-text="selectedIndices.length"></span> configurations?</p>
+        <p class="text-sm opacity-70 mb-4" x-show="selectedConfig && !isBulkDelete">
+            <strong x-text="selectedConfig?.name"></strong> - <span x-text="selectedConfig?.path"></span>
+        </p>
+        <div class="modal-action">
+            <form method="dialog" class="flex gap-2">
+                <button class="btn btn-ghost">Cancel</button>
+                <button @click="confirmDelete()" class="btn btn-error">Delete</button>
+            </form>
+        </div>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button>close</button>
+    </form>
+</dialog>
+
+<!-- Error/Alert Modal -->
+<dialog id="error_modal" class="modal">
+    <div class="modal-box border-t-4 border-error shadow-2xl">
+        <div class="flex items-center gap-3 text-error mb-4">
+            <div class="p-2 bg-error/10 rounded-full">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            </div>
+            <h3 class="font-bold text-lg" x-text="errorTitle"></h3>
+        </div>
+        <div class="bg-base-200 p-4 rounded-lg">
+            <p class="text-sm font-mono whitespace-pre-wrap break-all" x-text="errorMessage"></p>
+        </div>
+        <div class="modal-action">
+            <form method="dialog">
+                <button class="btn btn-error btn-outline px-8">Got it</button>
+            </form>
+        </div>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button>close</button>
+    </form>
+</dialog>
+
+<!-- Import OpenAPI Modal -->
+<dialog id="import_modal" class="modal">
+    <div class="modal-box max-w-2xl">
+        <h3 class="font-bold text-lg flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            </svg>
+            Import OpenAPI Specification
+        </h3>
+        <p class="py-2 text-sm opacity-70">Upload an OpenAPI 3.x or Swagger 2.0 specification file (JSON or YAML) to
+            automatically generate mock configurations.</p>
+
+        <div class="form-control w-full mt-4">
+            <label class="label">
+                <span class="label-text font-semibold">Select File</span>
+            </label>
+            <input type="file" id="openapi_file" accept=".json,.yaml,.yml"
+                class="file-input file-input-bordered file-input-primary w-full" @change="handleFileSelect($event)" />
+            <label class="label">
+                <span class="label-text-alt">Supported formats: JSON, YAML</span>
+            </label>
+        </div>
+
+        <div class="form-control mt-4">
+            <label class="label cursor-pointer justify-start gap-3">
+                <input type="checkbox" x-model="importMerge" class="checkbox checkbox-primary" />
+                <div>
+                    <span class="label-text font-semibold">Merge with existing configurations</span>
+                    <p class="text-xs opacity-70">If unchecked, all existing configurations will be replaced</p>
+                </div>
+            </label>
+        </div>
+
+        <div x-show="importFileName" class="alert alert-info mt-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>Selected: <strong x-text="importFileName"></strong></span>
+        </div>
+
+        <div class="modal-action">
+            <form method="dialog" class="flex gap-2">
+                <button class="btn btn-ghost">Cancel</button>
+                <button @click="importOpenAPI()" :disabled="!importFile || importLoading" class="btn btn-primary">
+                    <span x-show="!importLoading">Import</span>
+                    <span x-show="importLoading" class="loading loading-spinner loading-sm"></span>
+                    <span x-show="importLoading">Importing...</span>
+                </button>
+            </form>
+        </div>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button>close</button>
+    </form>
+</dialog>
+
+<!-- Floating Save Button -->
+<button type="button" @click="saveAll()" class="btn btn-primary fixed bottom-6 right-6 shadow-2xl z-50">
+    Save All
+</button>

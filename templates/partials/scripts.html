@@ -1,0 +1,544 @@
+<!-- Scripts -->
+<script>
+    // Assign directly to window object to ensure availability
+    window.serverConfigs = {{ .Configs }};
+    console.log('Window serverConfigs loaded:', window.serverConfigs ? window.serverConfigs.length : 'null');
+</script>
+
+<script src="https://unpkg.com/alpinejs" defer></script>
+<script>
+    // Theme toggle functionality
+    const themeToggle = document.getElementById('themeToggle');
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+
+    // Set initial theme
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    if (themeToggle) {
+        themeToggle.checked = savedTheme === 'light';
+
+        // Toggle theme on change
+        themeToggle.addEventListener('change', function () {
+            const newTheme = this.checked ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    }
+
+    function configManager() {
+        return {
+            configs: [],
+            selectedIndex: null,
+            searchQuery: '',
+            activeTab: 'conditionalResponses',
+            legacyTab: 'requestHeaders',
+            showSidebar: false,
+            modalMessage: '',
+            errorTitle: '',
+            errorMessage: '',
+            importFile: null,
+            importFileName: '',
+            importMerge: true,
+            importLoading: false,
+            selectedIndices: [],
+            isBulkDelete: false,
+
+            showError(title, msg) {
+                this.errorTitle = title;
+                this.errorMessage = msg;
+                document.getElementById('error_modal').showModal();
+            },
+
+            get selectedConfig() {
+                return this.selectedIndex !== null ? this.configs[this.selectedIndex] : null;
+            },
+
+            get filteredConfigs() {
+                const query = this.searchQuery.toLowerCase();
+                return this.configs
+                    .map((cfg, index) => ({ ...cfg, originalIndex: index }))
+                    .filter(cfg => {
+                        if (!query) return true;
+                        return cfg.name.toLowerCase().includes(query) ||
+                            cfg.path.toLowerCase().includes(query) ||
+                            cfg.method.toLowerCase().includes(query);
+                    });
+            },
+
+            get groupedConfigs() {
+                const filtered = this.filteredConfigs;
+                const groups = {};
+
+                filtered.forEach(cfg => {
+                    // Extract root path (e.g. /api/users -> /api)
+                    const pathParts = cfg.path.split('/').filter(p => p.length > 0);
+                    let rootPath = '/';
+                    if (pathParts.length > 0) {
+                        rootPath = '/' + pathParts[0];
+                    }
+
+                    if (!groups[rootPath]) {
+                        groups[rootPath] = [];
+                    }
+                    groups[rootPath].push(cfg);
+                });
+
+                // Convert to array and sort groups
+                return Object.keys(groups).sort().map(path => {
+                    // Sort configs within the group by full path
+                    const sortedConfigs = groups[path].sort((a, b) => a.path.localeCompare(b.path));
+                    return {
+                        path: path,
+                        configs: sortedConfigs
+                    };
+                });
+            },
+
+            selectConfig(index) {
+                this.selectedIndex = index;
+                this.activeTab = 'conditionalResponses';
+                this.showSidebar = false; // Close sidebar on mobile selection
+            },
+
+            toggleSelection(index) {
+                const idx = this.selectedIndices.indexOf(index);
+                if (idx > -1) {
+                    this.selectedIndices.splice(idx, 1);
+                } else {
+                    this.selectedIndices.push(index);
+                }
+            },
+
+            get isAllSelected() {
+                const filtered = this.filteredConfigs;
+                return filtered.length > 0 && filtered.every(cfg => this.selectedIndices.includes(cfg.originalIndex));
+            },
+
+            toggleSelectAll() {
+                if (this.isAllSelected) {
+                    const filteredIndices = this.filteredConfigs.map(cfg => cfg.originalIndex);
+                    this.selectedIndices = this.selectedIndices.filter(id => !filteredIndices.includes(id));
+                } else {
+                    const filteredIndices = this.filteredConfigs.map(cfg => cfg.originalIndex);
+                    this.selectedIndices = [...new Set([...this.selectedIndices, ...filteredIndices])];
+                }
+            },
+
+            addNewConfig() {
+                const newConfig = {
+                    name: 'New Configuration',
+                    method: 'GET',
+                    path: '/api/new',
+                    statusCode: 200,
+                    timeout: 0,
+                    requestHeaders: '{}',
+                    requestBody: '{}',
+                    responseHeaders: '{}',
+                    responseBody: '{}',
+                    responses: [],
+                    defaultResponse: {
+                        statusCode: 200,
+                        timeout: 0,
+                        headers: '{}',
+                        body: '{}'
+                    }
+                };
+                this.configs.push(newConfig);
+                this.selectedIndex = this.configs.length - 1;
+            },
+
+            // Conditional Response Management
+            addConditionalResponse() {
+                if (!this.selectedConfig.responses) {
+                    this.selectedConfig.responses = [];
+                }
+                this.selectedConfig.responses.push({
+                    name: 'New Response',
+                    ruleOperator: 'AND',
+                    rules: [],
+                    response: {
+                        statusCode: 200,
+                        timeout: 0,
+                        headers: '{}',
+                        body: '{}'
+                    }
+                });
+            },
+
+            deleteConditionalResponse(index) {
+                this.selectedConfig.responses.splice(index, 1);
+            },
+
+            addRule(responseIndex) {
+                if (!this.selectedConfig.responses[responseIndex].rules) {
+                    this.selectedConfig.responses[responseIndex].rules = [];
+                }
+                this.selectedConfig.responses[responseIndex].rules.push({
+                    target: 'body',
+                    field: '',
+                    operator: 'equals',
+                    value: ''
+                });
+            },
+
+            deleteRule(responseIndex, ruleIndex) {
+                this.selectedConfig.responses[responseIndex].rules.splice(ruleIndex, 1);
+            },
+
+            beautifyConditionalJSON(responseIndex, field) {
+                try {
+                    const resp = this.selectedConfig.responses[responseIndex].response;
+                    const parsed = JSON.parse(resp[field]);
+                    resp[field] = JSON.stringify(parsed, null, 2);
+                } catch (e) {
+                    this.showError('Invalid JSON', `Could not beautify ${field} JSON for ${this.selectedConfig.responses[responseIndex].name}.\n\nError: ${e.message}`);
+                }
+            },
+
+            beautifyDefaultJSON(field) {
+                try {
+                    const parsed = JSON.parse(this.selectedConfig.defaultResponse[field]);
+                    this.selectedConfig.defaultResponse[field] = JSON.stringify(parsed, null, 2);
+                } catch (e) {
+                    this.showError('Invalid JSON', `Could not beautify ${field} JSON for the default response.\n\nError: ${e.message}`);
+                }
+            },
+
+
+            duplicateConfig(index) {
+                const original = this.configs[index];
+
+                // Generate unique path by appending suffix
+                let newPath = original.path;
+                let suffix = 1;
+
+                // Check if path already ends with a number pattern like -copy-1, -copy-2, etc.
+                const copyPattern = /(-copy-?)(\d*)$/;
+                const match = newPath.match(copyPattern);
+
+                if (match) {
+                    // If it already has -copy suffix, increment the number
+                    const baseNumber = match[2] ? parseInt(match[2]) : 1;
+                    newPath = newPath.replace(copyPattern, `-copy-${baseNumber + 1}`);
+                } else {
+                    // First copy, just append -copy
+                    newPath = newPath + '-copy';
+                }
+
+                // Ensure the new path is truly unique
+                while (this.configs.some(cfg => cfg.path === newPath && cfg.method === original.method)) {
+                    suffix++;
+                    if (match) {
+                        const baseNumber = match[2] ? parseInt(match[2]) : 1;
+                        newPath = original.path.replace(copyPattern, `-copy-${baseNumber + suffix}`);
+                    } else {
+                        newPath = original.path + `-copy-${suffix}`;
+                    }
+                }
+
+                const duplicate = {
+                    name: original.name + ' (Copy)',
+                    method: original.method,
+                    path: newPath,
+                    statusCode: original.statusCode,
+                    timeout: original.timeout,
+                    requestHeaders: original.requestHeaders,
+                    requestBody: original.requestBody,
+                    responseHeaders: original.responseHeaders,
+                    responseBody: original.responseBody
+                };
+                this.configs.push(duplicate);
+                this.selectedIndex = this.configs.length - 1;
+                this.showSidebar = false; // Close sidebar on mobile after duplication
+            },
+
+            deleteCurrentConfig() {
+                if (this.selectedIndex === null) return;
+                this.isBulkDelete = false;
+                // Show the delete confirmation modal
+                document.getElementById('delete_modal').showModal();
+            },
+
+            deleteSelectedConfigs() {
+                if (this.selectedIndices.length === 0) return;
+                this.isBulkDelete = true;
+                document.getElementById('delete_modal').showModal();
+            },
+
+            confirmDelete() {
+                if (this.isBulkDelete) {
+                    fetch('/delete-configs', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ indices: this.selectedIndices })
+                    })
+                        .then((res) => {
+                            if (res.ok) {
+                                location.reload();
+                            } else {
+                                this.showError('Delete Failed', 'Failed to delete configurations. Server returned an error.');
+                            }
+                        });
+                    return;
+                }
+
+                if (this.selectedIndex === null) return;
+
+                fetch('/delete-config/' + this.selectedIndex, { method: 'POST' })
+                    .then((res) => {
+                        if (res.ok) {
+                            location.reload();
+                        } else {
+                            this.showError('Delete Failed', 'Failed to delete configuration. Server returned an error.');
+                        }
+                    });
+            },
+
+            beautifyJSON(field) {
+                try {
+                    const parsed = JSON.parse(this.selectedConfig[field]);
+                    this.selectedConfig[field] = JSON.stringify(parsed, null, 2);
+                } catch (e) {
+                    this.showError('Invalid JSON', `Could not beautify ${field} JSON.\n\nError: ${e.message}`);
+                }
+            },
+
+            saveAll() {
+                try {
+                    const configsToSave = this.configs.map(function (cfg, index) {
+                        // Validate and parse each JSON field for legacy format
+                        let requestHeaders, requestBody, responseHeaders, responseBody;
+
+                        try {
+                            requestHeaders = JSON.parse(cfg.requestHeaders || '{}');
+                        } catch (e) {
+                            throw new Error(`Config #${index + 1} (${cfg.name}): Invalid Request Headers JSON - ${e.message}`);
+                        }
+
+                        try {
+                            requestBody = JSON.parse(cfg.requestBody || '{}');
+                        } catch (e) {
+                            throw new Error(`Config #${index + 1} (${cfg.name}): Invalid Request Body JSON - ${e.message}`);
+                        }
+
+                        try {
+                            responseHeaders = JSON.parse(cfg.responseHeaders || '{}');
+                        } catch (e) {
+                            throw new Error(`Config #${index + 1} (${cfg.name}): Invalid Response Headers JSON - ${e.message}`);
+                        }
+
+                        try {
+                            responseBody = JSON.parse(cfg.responseBody || '{}');
+                        } catch (e) {
+                            throw new Error(`Config #${index + 1} (${cfg.name}): Invalid Response Body JSON - ${e.message}`);
+                        }
+
+                        // Process conditional responses if present
+                        let responses = [];
+                        if (cfg.responses && cfg.responses.length > 0) {
+                            responses = cfg.responses.map((resp, respIdx) => {
+                                try {
+                                    return {
+                                        name: resp.name,
+                                        ruleOperator: resp.ruleOperator || 'AND',
+                                        rules: resp.rules || [],
+                                        response: {
+                                            statusCode: parseInt(resp.response.statusCode) || 200,
+                                            timeout: parseInt(resp.response.timeout) || 0,
+                                            headers: JSON.parse(resp.response.headers || '{}'),
+                                            body: JSON.parse(resp.response.body || '{}')
+                                        }
+                                    };
+                                } catch (e) {
+                                    throw new Error(`Config #${index + 1} (${cfg.name}), Response #${respIdx + 1}: Invalid JSON - ${e.message}`);
+                                }
+                            });
+                        }
+
+                        // Process default response if present
+                        let defaultResponse = null;
+                        if (cfg.defaultResponse) {
+                            try {
+                                defaultResponse = {
+                                    statusCode: parseInt(cfg.defaultResponse.statusCode) || 200,
+                                    timeout: parseInt(cfg.defaultResponse.timeout) || 0,
+                                    headers: JSON.parse(cfg.defaultResponse.headers || '{}'),
+                                    body: JSON.parse(cfg.defaultResponse.body || '{}')
+                                };
+                            } catch (e) {
+                                throw new Error(`Config #${index + 1} (${cfg.name}): Invalid Default Response JSON - ${e.message}`);
+                            }
+                        }
+
+                        const result = {
+                            name: cfg.name,
+                            method: cfg.method,
+                            path: cfg.path,
+                            statusCode: parseInt(cfg.statusCode) || 200,
+                            timeout: parseInt(cfg.timeout) || 0,
+                            requestHeaders: requestHeaders,
+                            requestBody: requestBody,
+                            responseHeaders: responseHeaders,
+                            responseBody: responseBody
+                        };
+
+                        // Add conditional fields if present
+                        if (responses.length > 0) {
+                            result.responses = responses;
+                        }
+                        if (defaultResponse) {
+                            result.defaultResponse = defaultResponse;
+                        }
+
+                        return result;
+                    });
+
+                    fetch('/save', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(configsToSave)
+                    })
+                        .then((res) => {
+                            if (!res.ok) {
+                                return res.text().then(text => {
+                                    throw new Error(text || 'Failed to save');
+                                });
+                            }
+                            return res.text();
+                        })
+                        .then((msg) => {
+                            this.modalMessage = msg;
+                            document.getElementById('success_modal').showModal();
+                            // Reload after modal is closed
+                            setTimeout(() => location.reload(), 1500);
+                        })
+                        .catch((err) => {
+                            this.showError('Save Error', err.message);
+                        });
+                } catch (err) {
+                    this.showError('Validation Error', err.message);
+                }
+            },
+
+            // OpenAPI Import Functions
+            openImportModal() {
+                this.importFile = null;
+                this.importFileName = '';
+                this.importMerge = true;
+                this.importLoading = false;
+                document.getElementById('import_modal').showModal();
+            },
+
+            handleFileSelect(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    this.importFile = file;
+                    this.importFileName = file.name;
+                }
+            },
+
+            importOpenAPI() {
+                if (!this.importFile) {
+                    this.showError('No File Selected', 'Please select an OpenAPI specification file to import.');
+                    return;
+                }
+
+                this.importLoading = true;
+
+                const formData = new FormData();
+                formData.append('file', this.importFile);
+                formData.append('merge', this.importMerge ? 'true' : 'false');
+
+                fetch('/import-openapi', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(res => {
+                        if (!res.ok) {
+                            return res.json().then(data => {
+                                throw new Error(data.error || 'Failed to import specification');
+                            });
+                        }
+                        return res.json();
+                    })
+                    .then(data => {
+                        this.importLoading = false;
+                        document.getElementById('import_modal').close();
+                        this.modalMessage = data.message || `Successfully imported ${data.count} endpoints`;
+                        document.getElementById('success_modal').showModal();
+                        // Reload after modal is closed
+                        setTimeout(() => location.reload(), 1500);
+                    })
+                    .catch(err => {
+                        this.importLoading = false;
+                        this.showError('Import Failed', err.message);
+                    });
+            },
+
+            init() {
+                console.log('Alpine init started');
+                let data = window.serverConfigs || [];
+
+                if (!Array.isArray(data)) {
+                    console.warn('window.serverConfigs is not an array, defaulting to empty');
+                    data = [];
+                }
+
+                console.log('Initializing with configs:', data.length);
+
+                this.configs = data.map(function (cfg) {
+                    const config = {
+                        name: cfg.name || 'Unnamed',
+                        method: cfg.method || 'GET',
+                        path: cfg.path || '/',
+                        statusCode: cfg.statusCode || 200,
+                        timeout: cfg.timeout || 0,
+                        requestHeaders: JSON.stringify(cfg.requestHeaders || {}, null, 2),
+                        requestBody: JSON.stringify(cfg.requestBody || {}, null, 2),
+                        responseHeaders: JSON.stringify(cfg.responseHeaders || {}, null, 2),
+                        responseBody: JSON.stringify(cfg.responseBody || {}, null, 2),
+                        responses: [],
+                        defaultResponse: {
+                            statusCode: 200,
+                            timeout: 0,
+                            headers: '{}',
+                            body: '{}'
+                        }
+                    };
+
+                    // Load conditional responses if present
+                    if (cfg.responses && Array.isArray(cfg.responses)) {
+                        config.responses = cfg.responses.map(resp => ({
+                            name: resp.name || 'Unnamed Response',
+                            ruleOperator: resp.ruleOperator || 'AND',
+                            rules: resp.rules || [],
+                            response: {
+                                statusCode: resp.response?.statusCode || 200,
+                                timeout: resp.response?.timeout || 0,
+                                headers: JSON.stringify(resp.response?.headers || {}, null, 2),
+                                body: JSON.stringify(resp.response?.body || {}, null, 2)
+                            }
+                        }));
+                    }
+
+                    // Load default response if present
+                    if (cfg.defaultResponse) {
+                        config.defaultResponse = {
+                            statusCode: cfg.defaultResponse.statusCode || 200,
+                            timeout: cfg.defaultResponse.timeout || 0,
+                            headers: JSON.stringify(cfg.defaultResponse.headers || {}, null, 2),
+                            body: JSON.stringify(cfg.defaultResponse.body || {}, null, 2)
+                        };
+                    }
+
+                    return config;
+                });
+
+                console.log('Final configs count:', this.configs.length);
+
+                if (this.configs.length > 0) {
+                    this.selectedIndex = 0;
+                }
+            }
+        }
+    }
+</script>
