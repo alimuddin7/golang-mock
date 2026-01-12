@@ -4,7 +4,7 @@
         <div class="p-4 md:p-8 pt-4 md:pt-10 max-w-6xl mx-auto animation-fade-in">
             <!-- Sturdy Header -->
             <div
-                class="flex flex-col md:flex-row items-center justify-between mb-6 md:mb-8 gap-4 md:gap-6 pb-6 border-b-4 border-base-content">
+                class="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 md:mb-8 gap-4 md:gap-6 pb-6 border-b-4 border-base-content">
                 <div class="flex items-center gap-5">
                     <div class="relative group/method">
                         <select x-model="configs[selectedIndex].method" :class="{
@@ -13,7 +13,7 @@
                                 'bg-warning text-warning-content focus:ring-warning/30': configs[selectedIndex].method === 'PUT',
                                 'bg-error text-error-content focus:ring-error/30': configs[selectedIndex].method === 'DELETE'
                             }"
-                            class="appearance-none select select-sm rounded-lg font-medium font-mono text-xs border-2 border-base-content uppercase pr-8 focus:outline-none focus:ring-4 transition-all cursor-pointer">
+                            class="appearance-none select select-sm md:select-sm h-12 md:h-10 rounded-lg font-medium font-mono text-xs border-2 border-base-content uppercase pr-8 focus:outline-none focus:ring-4 transition-all cursor-pointer w-full md:w-auto">
                             <option value="GET">GET</option>
                             <option value="POST">POST</option>
                             <option value="PUT">PUT</option>
@@ -22,39 +22,39 @@
                             <option value="OPTIONS">OPTIONS</option>
                             <option value="HEAD">HEAD</option>
                         </select>
-                        <div
-                            class="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none opacity-50 group-hover/method:opacity-100 transition-opacity">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="4"
-                                    d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </div>
+                        <i
+                            class="ri-arrow-down-s-line absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none opacity-50 group-hover/method:opacity-100 transition-opacity text-xs"></i>
                     </div>
                     <div class="flex flex-col flex-1 min-w-0">
-                        <input type="text" x-model="configs[selectedIndex].name"
-                            class="text-3xl font-medium tracking-tighter uppercase bg-transparent border-none focus:outline-none focus:ring-2 focus:ring-primary/20 rounded-lg w-full p-1 -ml-1 transition-all"
-                            placeholder="Mock Name" />
+                        <div class="relative group/name flex items-center gap-3">
+                            <input type="text" x-model="configs[selectedIndex].name"
+                                class="text-2xl md:text-3xl font-medium tracking-tighter uppercase bg-transparent border-none focus:outline-none focus:ring-2 focus:ring-primary/20 rounded-lg flex-1 p-1 -ml-1 transition-all"
+                                placeholder="Mock Name" />
+                            <div
+                                class="w-8 h-8 rounded-lg bg-base-content/10 flex items-center justify-center opacity-40 group-hover/name:opacity-100 group-hover/name:bg-primary group-hover/name:text-primary-content transition-all shadow-sm">
+                                <i class="ri-edit-line text-lg"></i>
+                            </div>
+                        </div>
                         <div class="flex items-center gap-2 mt-1">
                             <div
-                                class="flex items-center gap-2 bg-neutral text-neutral-content px-3 py-1 rounded-xl border-2 border-base-content font-mono text-[11px] font-medium flex-1 md:flex-none max-w-md">
+                                class="flex items-center gap-2 bg-neutral text-neutral-content px-3 py-1 rounded-xl border-2 border-base-content font-mono text-[11px] font-medium flex-1 md:flex-none max-w-md group/path cursor-text">
                                 <span class="opacity-40 select-none">PATH:</span>
                                 <input type="text" x-model="configs[selectedIndex].path"
                                     class="bg-transparent border-none focus:outline-none p-0 h-auto w-full text-neutral-content"
                                     placeholder="/api/example" />
+                                <i
+                                    class="ri-pencil-fill text-primary opacity-60 group-hover/path:opacity-100 transition-opacity"></i>
                             </div>
                         </div>
                     </div>
                 </div>
-                <button @click="deleteCurrentConfig()"
-                    class="btn btn-error btn-sm rounded-lg gap-2 font-medium uppercase tracking-widest px-6 border-2 border-base-content transition-all">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                    Delete Mock
-                </button>
+                <div class="flex items-center gap-3 w-full md:w-auto mt-2 md:mt-0">
+                    <button @click="deleteCurrentConfig()"
+                        class="btn btn-error btn-sm rounded-lg gap-2 font-medium uppercase tracking-widest px-6 border-2 border-base-content transition-all flex-1 md:flex-none">
+                        <i class="ri-delete-bin-7-line text-sm"></i>
+                        Delete Mock
+                    </button>
+                </div>
             </div>
 
             <!-- Sturdy Tabs Interface -->
@@ -80,10 +80,7 @@
                     </div>
                     <button @click="addConditionalResponse()"
                         class="btn btn-success btn-sm rounded-lg gap-2 font-medium uppercase tracking-widest text-[10px] border-2 border-base-content transition-all">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4" />
-                        </svg>
+                        <i class="ri-add-line text-sm"></i>
                         Add New Rule
                     </button>
                 </div>
@@ -115,11 +112,7 @@
                                 </div>
                                 <button @click="deleteConditionalResponse(idx)"
                                     class="btn btn-ghost btn-sm btn-square text-error hover:bg-error/10 hover:border-error/20 rounded-xl">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
+                                    <i class="ri-delete-bin-7-line text-lg"></i>
                                 </button>
                             </div>
 
@@ -129,20 +122,12 @@
                                     <div class="flex items-center justify-between">
                                         <label
                                             class="text-[10px] font-medium uppercase tracking-widest text-primary flex items-center gap-2">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none"
-                                                viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                                    d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                            </svg>
+                                            <i class="ri-flashlight-line text-xs"></i>
                                             Matching Rules
                                         </label>
                                         <button @click="addRule(idx)"
                                             class="btn btn-xs btn-ghost gap-1 font-medium uppercase tracking-widest text-[9px] hover:bg-primary/10 rounded-lg">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none"
-                                                viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                                    d="M12 4v16m8-8H4" />
-                                            </svg>
+                                            <i class="ri-add-line text-xs"></i>
                                             Add Clause
                                         </button>
                                     </div>
@@ -170,11 +155,7 @@
                                                     class="input input-xs border-2 border-base-content/10 bg-base-200 focus:bg-base-200 font-mono text-xs w-full rounded-lg h-9" />
                                                 <button @click="deleteRule(idx, ridx)"
                                                     class="btn btn-ghost btn-xs opacity-40 group-hover/rule:opacity-100 text-error rounded-lg">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
-                                                        viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                                    </svg>
+                                                    <i class="ri-close-line text-sm text-error"></i>
                                                 </button>
                                             </div>
                                         </template>
@@ -211,30 +192,37 @@
                                             </div>
                                         </div>
                                         <div class="form-control group/json relative">
-                                            <div class="flex justify-between items-center mb-2">
-                                                <label class="label p-0"><span
-                                                        class="label-text text-[9px] font-medium uppercase tracking-widest opacity-40">Response
-                                                        Headers</span></label>
+                                            <label class="label p-0 mb-1">
+                                                <span
+                                                    class="label-text text-[9px] font-medium uppercase tracking-widest opacity-40">Response
+                                                    Headers</span>
+                                            </label>
+                                            <div class="relative group/prettify">
+                                                <textarea x-model="resp.response.headers"
+                                                    class="textarea border-2 border-base-content/10 bg-base-100 font-mono text-[10px] h-32 w-full rounded-2xl resize-none focus:border-info leading-relaxed"></textarea>
                                                 <button @click="beautifyConditionalJSON(idx, 'headers')"
-                                                    class="btn btn-ghost btn-xs text-[8px] font-medium uppercase tracking-widest opacity-0 group-hover/json:opacity-40 hover:opacity-100 transition-opacity">Prettify</button>
+                                                    class="absolute top-2 right-2 btn btn-ghost btn-xs gap-1.5 rounded-lg font-medium uppercase tracking-widest text-[9px] opacity-0 group-hover/prettify:opacity-100 hover:bg-info/20 transition-all border border-base-content/10 bg-base-100/80 backdrop-blur-sm shadow-sm">
+                                                    <i class="ri-magic-line text-xs"></i>
+                                                    Prettify
+                                                </button>
                                             </div>
-                                            <textarea x-model="resp.response.headers"
-                                                class="textarea border-2 border-base-content/10 bg-base-100 font-mono text-[10px] h-32 rounded-2xl resize-none focus:border-info leading-relaxed"></textarea>
                                         </div>
                                     </div>
                                     <div class="flex flex-col">
-                                        <div class="flex justify-between items-center mb-2">
-                                            <div class="flex items-center gap-2">
-                                                <div class="w-1.5 h-6 bg-primary rounded-full"></div>
-                                                <h4
-                                                    class="text-[10px] font-medium uppercase tracking-widest opacity-60">
-                                                    JSON Response Payload</h4>
-                                            </div>
+                                        <label class="label p-0 mb-1">
+                                            <span
+                                                class="label-text text-[9px] font-medium uppercase tracking-widest opacity-40">JSON
+                                                Response Payload</span>
+                                        </label>
+                                        <div class="relative group/prettify flex-1">
+                                            <textarea x-model="resp.response.body"
+                                                class="textarea h-full w-full border-2 border-base-content/10 bg-base-100 font-mono text-[10px] rounded-2xl resize-none focus:border-primary leading-relaxed p-5 min-h-[240px]"></textarea>
                                             <button @click="beautifyConditionalJSON(idx, 'body')"
-                                                class="btn btn-ghost btn-xs text-[8px] font-medium uppercase tracking-widest opacity-40 hover:opacity-100">Prettify</button>
+                                                class="absolute top-2 right-2 btn btn-ghost btn-xs gap-1.5 rounded-lg font-medium uppercase tracking-widest text-[9px] opacity-0 group-hover/prettify:opacity-100 hover:bg-primary/20 transition-all border border-base-content/10 bg-base-100/80 backdrop-blur-sm shadow-sm">
+                                                <i class="ri-magic-line text-xs"></i>
+                                                Prettify
+                                            </button>
                                         </div>
-                                        <textarea x-model="resp.response.body"
-                                            class="textarea flex-1 border-2 border-base-content/10 bg-base-100 font-mono text-[10px] rounded-2xl resize-none focus:border-primary leading-relaxed p-5 h-[240px]"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -274,31 +262,39 @@
                                 </div>
 
                                 <div class="form-control group/json relative">
-                                    <div class="flex justify-between items-center mb-2">
-                                        <label class="label p-0"><span
-                                                class="label-text text-[9px] font-medium uppercase tracking-widest opacity-40">Response
-                                                Headers</span></label>
+                                    <label class="label p-0 mb-1">
+                                        <span
+                                            class="label-text text-[9px] font-medium uppercase tracking-widest opacity-40">Response
+                                            Headers</span>
+                                    </label>
+                                    <div class="relative group/prettify">
+                                        <textarea x-model="selectedConfig.responseHeaders"
+                                            class="textarea border-2 border-base-content/10 bg-base-100 font-mono text-[10px] h-40 w-full rounded-3xl resize-none focus:border-primary leading-relaxed p-5"></textarea>
                                         <button @click="beautifyJSON('responseHeaders')"
-                                            class="btn btn-ghost btn-xs text-[8px] font-medium uppercase tracking-widest opacity-40 hover:opacity-100 transition-opacity">Prettify
-                                            JSON</button>
+                                            class="absolute top-3 right-3 btn btn-ghost btn-xs gap-1.5 rounded-lg font-medium uppercase tracking-widest text-[9px] opacity-0 group-hover/prettify:opacity-100 hover:bg-primary/20 transition-all border border-base-content/10 bg-base-100/80 backdrop-blur-sm shadow-sm">
+                                            <i class="ri-magic-line text-xs"></i>
+                                            Prettify
+                                        </button>
                                     </div>
-                                    <textarea x-model="selectedConfig.responseHeaders"
-                                        class="textarea border-2 border-base-content/10 bg-base-100 font-mono text-[10px] h-40 rounded-3xl resize-none focus:border-primary leading-relaxed p-5"></textarea>
                                 </div>
                             </div>
 
                             <!-- Payload -->
                             <div class="flex flex-col h-full">
-                                <div class="flex justify-between items-center mb-2">
-                                    <label class="label p-0"><span
-                                            class="label-text text-[9px] font-medium uppercase tracking-widest opacity-40">Response
-                                            Payload</span></label>
+                                <label class="label p-0 mb-1">
+                                    <span
+                                        class="label-text text-[9px] font-medium uppercase tracking-widest opacity-40">Response
+                                        Payload</span>
+                                </label>
+                                <div class="relative group/prettify flex-1">
+                                    <textarea x-model="selectedConfig.responseBody"
+                                        class="textarea h-full w-full border-2 border-base-content/10 bg-base-100 font-mono text-[11px] rounded-[2rem] resize-none focus:border-primary leading-relaxed p-6 min-h-[320px]"></textarea>
                                     <button @click="beautifyJSON('responseBody')"
-                                        class="btn btn-ghost btn-xs text-[8px] font-medium uppercase tracking-widest opacity-40 hover:opacity-100">Prettify
-                                        Payload</button>
+                                        class="absolute top-4 right-4 btn btn-ghost btn-xs gap-1.5 rounded-lg font-medium uppercase tracking-widest text-[9px] opacity-0 group-hover/prettify:opacity-100 hover:bg-primary/20 transition-all border border-base-content/10 bg-base-100/80 backdrop-blur-sm shadow-sm">
+                                        <i class="ri-magic-line text-xs"></i>
+                                        Prettify
+                                    </button>
                                 </div>
-                                <textarea x-model="selectedConfig.responseBody"
-                                    class="textarea flex-1 border-2 border-base-content/10 bg-base-100 font-mono text-[11px] rounded-[2rem] resize-none focus:border-primary leading-relaxed p-6 h-[320px]"></textarea>
                             </div>
                         </div>
 
@@ -313,26 +309,36 @@
                             <div class="collapse-content px-8 pb-8">
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
                                     <div class="form-control">
-                                        <div class="flex justify-between items-center mb-2">
+                                        <label class="label p-0 mb-1">
                                             <span
                                                 class="text-[9px] font-medium uppercase tracking-widest opacity-40">Required
                                                 Req. Headers</span>
+                                        </label>
+                                        <div class="relative group/prettify">
+                                            <textarea x-model="selectedConfig.requestHeaders"
+                                                class="textarea border-2 border-base-content/10 bg-base-200 font-mono text-[10px] h-32 w-full rounded-2xl resize-none focus:border-primary p-4"></textarea>
                                             <button @click="beautifyJSON('requestHeaders')"
-                                                class="btn btn-ghost btn-xs text-[8px] font-medium uppercase">Prettify</button>
+                                                class="absolute top-2 right-2 btn btn-ghost btn-xs gap-1.5 rounded-lg font-medium uppercase tracking-widest text-[9px] opacity-0 group-hover/prettify:opacity-100 hover:bg-primary/20 transition-all border border-base-content/10 bg-base-100/80 backdrop-blur-sm shadow-sm">
+                                                <i class="ri-magic-line text-xs"></i>
+                                                Prettify
+                                            </button>
                                         </div>
-                                        <textarea x-model="selectedConfig.requestHeaders"
-                                            class="textarea border-2 border-base-content/10 bg-base-200 font-mono text-[10px] h-32 rounded-2xl resize-none focus:border-primary"></textarea>
                                     </div>
                                     <div class="form-control">
-                                        <div class="flex justify-between items-center mb-2">
+                                        <label class="label p-0 mb-1">
                                             <span
                                                 class="text-[9px] font-medium uppercase tracking-widest opacity-40">Required
                                                 Req. Body</span>
+                                        </label>
+                                        <div class="relative group/prettify">
+                                            <textarea x-model="selectedConfig.requestBody"
+                                                class="textarea border-2 border-base-content/10 bg-base-200 font-mono text-[10px] h-32 w-full rounded-2xl resize-none focus:border-primary p-4"></textarea>
                                             <button @click="beautifyJSON('requestBody')"
-                                                class="btn btn-ghost btn-xs text-[8px] font-medium uppercase">Prettify</button>
+                                                class="absolute top-2 right-2 btn btn-ghost btn-xs gap-1.5 rounded-lg font-medium uppercase tracking-widest text-[9px] opacity-0 group-hover/prettify:opacity-100 hover:bg-primary/20 transition-all border border-base-content/10 bg-base-100/80 backdrop-blur-sm shadow-sm">
+                                                <i class="ri-magic-line text-xs"></i>
+                                                Prettify
+                                            </button>
                                         </div>
-                                        <textarea x-model="selectedConfig.requestBody"
-                                            class="textarea border-2 border-base-content/10 bg-base-200 font-mono text-[10px] h-32 rounded-2xl resize-none focus:border-primary"></textarea>
                                     </div>
                                 </div>
                             </div>
