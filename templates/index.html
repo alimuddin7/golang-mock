@@ -29,9 +29,10 @@
             display: none !important;
         }
 
+        /* Modern Scrollbar */
         .custom-scrollbar::-webkit-scrollbar {
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
         }
 
         .custom-scrollbar::-webkit-scrollbar-track {
@@ -40,31 +41,23 @@
 
         .custom-scrollbar::-webkit-scrollbar-thumb {
             background: hsl(var(--bc) / 0.1);
-            border: 2px solid transparent;
-            background-clip: padding-box;
-            border-radius: 8px;
+            border-radius: 20px;
         }
 
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: hsl(var(--bc) / 0.2);
-            border: 2px solid transparent;
-            background-clip: padding-box;
         }
 
-        /* Firm Border Theme */
-        .firm-border {
-            border: 3px solid hsl(var(--bc));
-        }
-
-        .firm-border-sm {
-            border: 2px solid hsl(var(--bc) / 0.1);
+        /* Simplified Borders */
+        .soft-border {
+            border: 1px solid hsl(var(--bc) / 0.1);
         }
 
         /* Animations */
         @keyframes fadeIn {
             from {
                 opacity: 0;
-                transform: translateY(5px);
+                transform: translateY(10px);
             }
 
             to {
@@ -74,12 +67,12 @@
         }
 
         .animation-fade-in {
-            animation: fadeIn 0.3s ease-out forwards;
+            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
         .workspace-height {
-            height: calc(100vh - 5rem);
-            /* 100vh - navbar height (h-20) */
+            height: calc(100vh - 4rem);
+            /* 100vh - navbar height (h-16) */
         }
     </style>
 </head>
@@ -99,9 +92,11 @@
         </div>
 
         <!-- Main Workspace -->
-        <main class="flex-1 flex flex-col md:flex-row overflow-hidden relative workspace-height">
+        <main class="flex-1 flex flex-col md:flex-row overflow-hidden relative bg-base-200/50">
             {{ template "partials/sidebar" . }}
-            {{ template "partials/editor" . }}
+            <div class="flex-1 overflow-hidden h-full workspace-height">
+                {{ template "partials/editor" . }}
+            </div>
         </main>
     </div>
 

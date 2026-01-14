@@ -1,17 +1,17 @@
 <!-- Features Modal -->
 <dialog id="features_modal" class="modal">
     <div
-        class="modal-box bg-base-100 border-4 border-base-content rounded-[2.5rem] p-10 max-w-4xl relative overflow-hidden">
+        class="modal-box bg-base-100 border border-base-200 rounded-[2.5rem] p-8 md:p-12 max-w-4xl relative overflow-hidden shadow-2xl">
         <div class="flex flex-col gap-10">
             <!-- Header Section -->
-            <div class="flex items-center gap-6 border-b-4 border-base-content/5 pb-8 relative">
+            <div class="flex items-center gap-6 border-b border-base-200 pb-8 relative">
                 <div
-                    class="w-16 h-16 bg-primary text-primary-content rounded-2xl flex items-center justify-center border-4 border-base-content rotate-3">
+                    class="w-16 h-16 bg-primary/10 text-primary rounded-2xl flex items-center justify-center border border-primary/20">
                     <i class="ri-flashlight-line text-4xl"></i>
                 </div>
                 <div>
-                    <h3 class="text-4xl font-medium uppercase tracking-tighter italic">Platform Features</h3>
-                    <p class="text-[11px] font-medium uppercase tracking-[0.3em] opacity-40">System Capabilities & Tools
+                    <h3 class="text-3xl font-bold tracking-tight">Platform Features</h3>
+                    <p class="text-[10px] font-bold uppercase tracking-widest opacity-30">System Capabilities & Tools
                     </p>
                 </div>
             </div>
@@ -20,90 +20,63 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Feature 1 -->
                 <div
-                    class="flex items-start gap-5 bg-base-200 p-6 rounded-2xl border-2 border-base-content/10 hover:border-primary/40 transition-all group">
+                    class="flex items-start gap-5 bg-base-200/50 p-6 rounded-2xl border border-transparent hover:border-primary/20 transition-all group">
                     <div
-                        class="w-12 h-12 bg-info text-info-content rounded-xl flex items-center justify-center border-2 border-base-content shrink-0 transition-transform group-hover:rotate-6">
+                        class="w-12 h-12 bg-info/10 text-info rounded-xl flex items-center justify-center border border-info/20 shrink-0 transition-transform group-hover:rotate-6">
                         <i class="ri-shield-check-line text-2xl"></i>
                     </div>
                     <div class="space-y-1">
-                        <h4 class="font-medium text-lg uppercase tracking-tight">Conditional Rule Engine</h4>
-                        <p class="text-xs font-medium opacity-40 leading-relaxed uppercase tracking-tight">
-                            Logic-based
-                            responses using JSON body, headers, or query parameters.</p>
+                        <h4 class="font-bold text-lg tracking-tight">Conditional Engine</h4>
+                        <p class="text-xs font-bold opacity-30 leading-relaxed uppercase tracking-tight">
+                            Logic-based responses using JSON body, headers, or parameters.</p>
                     </div>
                 </div>
 
                 <!-- Feature 2 -->
                 <div
-                    class="flex items-start gap-5 bg-base-200 p-6 rounded-2xl border-2 border-base-content/10 hover:border-success/40 transition-all group">
+                    class="flex items-start gap-5 bg-base-200/50 p-6 rounded-2xl border border-transparent hover:border-success/20 transition-all group">
                     <div
-                        class="w-12 h-12 bg-success text-success-content rounded-xl flex items-center justify-center border-2 border-base-content shrink-0 transition-transform group-hover:-rotate-6">
+                        class="w-12 h-12 bg-success/10 text-success rounded-xl flex items-center justify-center border border-success/20 shrink-0 transition-transform group-hover:-rotate-6">
                         <i class="ri-upload-cloud-2-line text-2xl"></i>
                     </div>
                     <div class="space-y-1">
-                        <h4 class="font-medium text-lg uppercase tracking-tight">OpenAPI Integration</h4>
-                        <p class="text-xs font-medium opacity-40 leading-relaxed uppercase tracking-tight">Instantly
-                            generate mocks from OpenAPI 3.x and Swagger specifications.</p>
+                        <h4 class="font-bold text-lg tracking-tight">OpenAPI Integration</h4>
+                        <p class="text-xs font-bold opacity-30 leading-relaxed uppercase tracking-tight">Instantly
+                            generate mocks from OpenAPI 3.x and Swagger specs.</p>
                     </div>
                 </div>
 
                 <!-- Feature 3 -->
                 <div
-                    class="flex items-start gap-5 bg-base-200 p-6 rounded-2xl border-2 border-base-content/10 hover:border-warning/40 transition-all group">
+                    class="flex items-start gap-5 bg-base-200/50 p-6 rounded-2xl border border-transparent hover:border-warning/20 transition-all group">
                     <div
-                        class="w-12 h-12 bg-warning text-warning-content rounded-xl flex items-center justify-center border-2 border-base-content shrink-0 transition-transform group-hover:rotate-6">
+                        class="w-12 h-12 bg-warning/10 text-warning rounded-xl flex items-center justify-center border border-warning/20 shrink-0 transition-transform group-hover:rotate-6">
                         <i class="ri-time-line text-2xl"></i>
                     </div>
                     <div class="space-y-1">
-                        <h4 class="font-medium text-lg uppercase tracking-tight">Latency Simulation</h4>
-                        <p class="text-xs font-medium opacity-40 leading-relaxed uppercase tracking-tight">Simulate
-                            network delays and timeouts to test frontend resilience.</p>
+                        <h4 class="font-bold text-lg tracking-tight">Latency Simulation</h4>
+                        <p class="text-xs font-bold opacity-30 leading-relaxed uppercase tracking-tight">Simulate
+                            network delays and timeouts for resilience testing.</p>
                     </div>
                 </div>
 
                 <!-- Feature 4 -->
                 <div
-                    class="flex items-start gap-5 bg-base-200 p-6 rounded-2xl border-2 border-base-content/10 hover:border-secondary/40 transition-all group">
+                    class="flex items-start gap-5 bg-base-200/50 p-6 rounded-2xl border border-transparent hover:border-secondary/20 transition-all group">
                     <div
-                        class="w-12 h-12 bg-secondary text-secondary-content rounded-xl flex items-center justify-center border-2 border-base-content shrink-0 transition-transform group-hover:-rotate-6">
+                        class="w-12 h-12 bg-secondary/10 text-secondary rounded-xl flex items-center justify-center border border-secondary/20 shrink-0 transition-transform group-hover:-rotate-6">
                         <i class="ri-file-copy-line text-2xl"></i>
                     </div>
                     <div class="space-y-1">
-                        <h4 class="font-medium text-lg uppercase tracking-tight">Bulk Operations</h4>
-                        <p class="text-xs font-medium opacity-40 leading-relaxed uppercase tracking-tight">Manage
-                            your mock catalog with multi-select deletion and duplication.</p>
+                        <h4 class="font-bold text-lg tracking-tight">Bulk Operations</h4>
+                        <p class="text-xs font-bold opacity-30 leading-relaxed uppercase tracking-tight">Manage
+                            your catalog with multi-select deletion and duplication.</p>
                     </div>
                 </div>
             </div>
-
-            <!-- Usage Info -->
-            <!-- <div
-                class="p-8 bg-base-content text-base-100 rounded-[1.5rem] border-4 border-base-content flex flex-col md:flex-row items-center gap-6">
-                <div class="flex-1 text-center md:text-left space-y-1">
-                    <h5 class="text-xl font-medium italic">How to Deploy?</h5>
-                    <p class="text-[10px] font-medium uppercase tracking-[0.2em] opacity-60">Your mocks are live at:
-                        <span class="text-primary">http://localhost:8080/{path}</span>
-                    </p>
-                </div>
-                <div class="h-10 w-[2px] bg-base-100/20 hidden md:block"></div>
-                <div class="flex gap-4">
-                    <div class="flex items-center gap-2">
-                        <div class="badge badge-primary border-2 border-base-100 font-medium px-2">HOT</div>
-                        <span class="text-[10px] font-medium uppercase tracking-widest opacity-80">Regex Ready</span>
-                    </div>
-                </div>
-            </div> -->
-
-            <!-- Footer Action -->
-            <!-- <div class="modal-action">
-                <form method="dialog" class="w-full">
-                    <button
-                        class="btn btn-neutral w-full rounded-xl border-2 border-base-content font-medium uppercase tracking-widest h-14 transition-all">Understood</button>
-                </form>
-            </div> -->
         </div>
     </div>
-    <form method="dialog" class="modal-backdrop bg-base-content/10">
+    <form method="dialog" class="modal-backdrop bg-base-content/5 backdrop-blur-sm">
         <button>close</button>
     </form>
 </dialog>

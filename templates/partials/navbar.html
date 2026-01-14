@@ -1,51 +1,48 @@
 <!-- Navbar -->
-<nav class="navbar bg-base-100 sticky top-0 z-[100] border-b-4 border-base-content px-4 md:px-8 h-20">
+<nav class="navbar bg-base-100 sticky top-0 z-[100] border-b border-base-200 px-4 md:px-8 h-16 shadow-sm">
     <!-- Navbar Start: Mobile Toggle & Branding -->
     <div class="navbar-start gap-2">
-        <button @click="showSidebar = !showSidebar"
-            class="btn btn-ghost btn-sm btn-square md:hidden border-2 border-base-content hover:bg-primary hover:text-primary-content">
+        <button @click="showSidebar = !showSidebar" class="btn btn-ghost btn-sm btn-square md:hidden">
             <i class="ri-menu-2-line text-lg"></i>
         </button>
-        <a href="/" class="flex items-center gap-2 md:gap-4 group">
-            <div
-                class="text-base-100 p-1.5 md:p-2 rounded-lg md:xl border-2 border-base-content transition-all group-hover:scale-105">
-                <img src="/static/logo.png" alt="GopherMock" class="h-6 w-6 md:h-9 md:w-9 object-contain" />
+        <a href="/" class="flex items-center gap-3 group">
+            <div class="bg-primary/10 p-2 rounded-xl transition-all group-hover:scale-110">
+                <img src="/static/logo.png" alt="GopherMock" class="h-6 w-6 md:h-7 md:w-7 object-contain" />
             </div>
             <div class="flex flex-col leading-tight">
-                <span class="text-lg md:text-2xl font-medium tracking-tighter uppercase whitespace-nowrap">
+                <span class="text-lg md:text-xl font-bold tracking-tight">
                     Gopher<span class="text-primary italic">Mock</span>
                 </span>
-                <span class="text-[8px] md:text-[10px] uppercase tracking-[0.3em] font-medium opacity-40">Editor</span>
+                <span class="text-[9px] uppercase tracking-widest font-semibold opacity-40">Editor</span>
             </div>
         </a>
     </div>
 
     <!-- Navbar End: Actions -->
-    <div class="navbar-end flex items-center gap-2 md:gap-4">
-        <!-- Features Button (Icon only on mobile) -->
+    <div class="navbar-end flex items-center gap-2 md:gap-3">
+        <!-- Features Button -->
         <button onclick="features_modal.showModal()"
-            class="btn btn-ghost btn-sm btn-square md:btn-wide md:w-auto rounded-lg gap-2 font-medium uppercase tracking-widest text-[10px] border-2 border-transparent hover:border-base-content/20 transition-all px-0 md:px-4">
+            class="btn btn-ghost btn-sm rounded-lg gap-2 text-[11px] font-bold uppercase tracking-wider px-4">
             <div class="relative flex h-2 w-2">
+                <span class="absolute inline-flex h-full w-full rounded-full bg-primary opacity-75 animate-ping"></span>
                 <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
             </div>
             <span class="hidden md:inline">Features</span>
         </button>
 
-        <!-- Import Button (Icon only on mobile) -->
+        <!-- Import Button -->
         <button @click="openImportModal()"
-            class="btn btn-primary btn-sm btn-square md:btn-wide md:w-auto rounded-lg md:px-6 font-medium uppercase tracking-widest text-[10px] border-2 border-base-content transition-all h-10 px-0">
+            class="btn btn-primary btn-sm rounded-lg md:px-5 text-[11px] font-bold uppercase tracking-wider h-10 shadow-sm transition-all hover:shadow-md">
             <i class="ri-upload-cloud-2-line text-lg"></i>
             <span class="hidden md:inline ml-2">Import</span>
         </button>
 
         <!-- Theme Toggle Wrapper -->
-        <div class="flex items-center gap-2 h-10 px-2 md:px-3 bg-base-200 rounded-xl border-2 border-base-content/10">
-            <div
-                class="badge badge-ghost h-6 text-[9px] font-medium opacity-40 rounded-lg px-2 bg-base-100 border-none shadow-sm hidden sm:flex">
-                V2.1</div>
-            <label class="flex cursor-pointer gap-1 md:gap-2 items-center">
-                <input type="checkbox" value="light"
-                    class="toggle toggle-primary toggle-xs md:toggle-sm theme-controller" id="themeToggle" />
+        <div class="flex items-center gap-2 h-10 px-2 bg-base-200/50 rounded-xl border border-base-200">
+            <div class="badge badge-sm badge-ghost font-bold opacity-50 px-2 rounded-lg hidden sm:flex">V2.1</div>
+            <label class="flex cursor-pointer items-center">
+                <input type="checkbox" value="light" class="toggle toggle-primary toggle-xs theme-controller"
+                    id="themeToggle" />
             </label>
         </div>
     </div>

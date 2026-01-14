@@ -52,6 +52,16 @@
                 return this.selectedIndex !== null ? this.configs[this.selectedIndex] : null;
             },
 
+            getMethodBadgeClass(method) {
+                return {
+                    'bg-info/10 text-info border-info/20': method === 'GET',
+                    'bg-success/10 text-success border-success/20': method === 'POST',
+                    'bg-warning/10 text-warning border-warning/20': method === 'PUT',
+                    'bg-error/10 text-error border-error/20': method === 'DELETE',
+                    'bg-secondary/10 text-secondary border-secondary/20': !['GET', 'POST', 'PUT', 'DELETE'].includes(method)
+                };
+            },
+
             get filteredConfigs() {
                 const query = this.searchQuery.toLowerCase();
                 return this.configs
@@ -66,31 +76,55 @@
 
             get groupedConfigs() {
                 const filtered = this.filteredConfigs;
-                const groups = {};
+                const root = { children: {}, configs: [] };
 
                 filtered.forEach(cfg => {
-                    // Extract root path (e.g. /api/users -> /api)
-                    const pathParts = cfg.path.split('/').filter(p => p.length > 0);
-                    let rootPath = '/';
-                    if (pathParts.length > 0) {
-                        rootPath = '/' + pathParts[0];
+                    const parts = cfg.path.split('/').filter(p => p.length > 0);
+                    let current = root;
+
+                    for (let i = 0; i < parts.length; i++) {
+                        const part = parts[i];
+                        if (i === parts.length - 1) {
+                            // Last part, it's an item in the current group
+                            current.configs.push(cfg);
+                        } else {
+                            // Mid part, it's a folder
+                            if (!current.children[part]) {
+                                current.children[part] = { children: {}, configs: [] };
+                            }
+                            current = current.children[part];
+                        }
                     }
 
-                    if (!groups[rootPath]) {
-                        groups[rootPath] = [];
+                    // If it's the root path '/'
+                    if (parts.length === 0) {
+                        root.configs.push(cfg);
                     }
-                    groups[rootPath].push(cfg);
                 });
 
-                // Convert to array and sort groups
-                return Object.keys(groups).sort().map(path => {
-                    // Sort configs within the group by full path
-                    const sortedConfigs = groups[path].sort((a, b) => a.path.localeCompare(b.path));
-                    return {
-                        path: path,
-                        configs: sortedConfigs
-                    };
-                });
+                const buildGroupedArray = (node, path = '') => {
+                    const result = [];
+
+                    // Sort children keys
+                    const keys = Object.keys(node.children).sort();
+
+                    keys.forEach(key => {
+                        const child = node.children[key];
+                        result.push({
+                            name: key,
+                            fullPath: path + '/' + key,
+                            children: buildGroupedArray(child, path + '/' + key),
+                            configs: child.configs.sort((a, b) => a.name.localeCompare(b.name))
+                        });
+                    });
+
+                    return result;
+                };
+
+                return {
+                    rootConfigs: root.configs.sort((a, b) => a.name.localeCompare(b.name)),
+                    tree: buildGroupedArray(root)
+                };
             },
 
             selectConfig(index) {
@@ -304,6 +338,18 @@
 
             saveAll() {
                 try {
+                    // Pre-validation: Check for duplicate path + method combinations
+                    const pathMap = new Map();
+                    for (let i = 0; i < this.configs.length; i++) {
+                        const cfg = this.configs[i];
+                        const key = `${cfg.method}:${cfg.path}`;
+                        if (pathMap.has(key)) {
+                            const firstIndex = pathMap.get(key);
+                            throw new Error(`Duplicate configuration found: "${cfg.method} ${cfg.path}" is defined in both "${this.configs[firstIndex].name}" and "${cfg.name}".`);
+                        }
+                        pathMap.set(key, i);
+                    }
+
                     const configsToSave = this.configs.map(function (cfg, index) {
                         // Validate and parse each JSON field for legacy format
                         let requestHeaders, requestBody, responseHeaders, responseBody;

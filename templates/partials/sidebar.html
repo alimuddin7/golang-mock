@@ -1,17 +1,15 @@
 <!-- Left Sidebar -->
-<div class="fixed md:relative top-20 md:top-0 left-0 w-80 bg-base-100 border-r-4 border-base-content flex flex-col transition-all duration-300 z-[90] h-[calc(100vh-5rem)] md:h-full"
+<div class="fixed md:relative top-16 md:top-0 left-0 w-80 bg-base-100 border-r border-base-200 flex flex-col transition-all duration-300 z-[90] h-[calc(100vh-4rem)] md:h-full"
     :class="{ '-translate-x-full md:translate-x-0': !showSidebar, 'translate-x-0': showSidebar }">
-    <div class="p-5 border-b-2 border-base-content/10 bg-base-200/50">
+    <div class="p-5 border-b border-base-200 bg-base-200/20">
         <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xs font-medium uppercase tracking-[0.2em] text-base-content">Configurations</h2>
+            <h2 class="text-[10px] font-bold uppercase tracking-widest text-base-content/60">Configurations</h2>
             <div class="flex gap-2">
                 <button x-show="selectedIndices.length > 0" @click="deleteSelectedConfigs()"
-                    class="btn btn-error btn-xs btn-square border-2 border-base-content transition-all"
-                    title="Delete Selected">
+                    class="btn btn-error btn-xs btn-square shadow-sm" title="Delete Selected">
                     <i class="ri-delete-bin-7-line text-xs"></i>
                 </button>
-                <button @click="addNewConfig()"
-                    class="btn btn-primary btn-xs btn-square border-2 border-base-content transition-all"
+                <button @click="addNewConfig()" class="btn btn-primary btn-xs btn-square shadow-sm"
                     title="Add New Configuration">
                     <i class="ri-add-line text-xs"></i>
                 </button>
@@ -19,87 +17,138 @@
         </div>
         <div class="relative group">
             <div
-                class="absolute inset-y-0 left-3 flex items-center pointer-events-none opacity-40 group-focus-within:opacity-100 transition-opacity">
+                class="absolute inset-y-0 left-3 flex items-center pointer-events-none opacity-60 group-focus-within:opacity-100 transition-opacity">
                 <i class="ri-search-line text-sm"></i>
             </div>
             <input type="text" placeholder="Search Mocks..."
-                class="input input-sm bg-base-100 border-2 border-base-content w-full pl-9 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-primary/20"
+                class="input input-sm border border-base-300 w-full pl-9 rounded-xl transition-all focus:outline-none focus:border-primary/50"
                 x-model="searchQuery" />
         </div>
         <div class="flex justify-between items-center mt-3">
             <label class="flex items-center gap-2 cursor-pointer group">
-                <input type="checkbox"
-                    class="checkbox checkbox-primary checkbox-xs rounded border-2 border-base-content"
+                <input type="checkbox" class="checkbox checkbox-primary checkbox-xs rounded-md border-base-300"
                     :checked="isAllSelected" @change="toggleSelectAll()" />
-                <span class="text-[9px] font-medium uppercase tracking-widest opacity-60">Select All</span>
+                <span
+                    class="text-[10px] font-bold uppercase tracking-wider opacity-60 group-hover:opacity-100 transition-opacity">Select
+                    All</span>
             </label>
-            <div class="badge badge-neutral badge-xs py-2 px-2 font-medium border-2 border-base-content"
-                x-text="`${filteredConfigs.length}`">
+            <div class="badge badge-sm badge-neutral font-bold px-2" x-text="`${filteredConfigs.length}`">
             </div>
         </div>
     </div>
 
-    <div class="flex-1 overflow-y-auto custom-scrollbar">
-        <ul class="menu menu-sm w-full p-3 pb-24 gap-2">
-            <template x-for="group in groupedConfigs" :key="group.path">
-                <li class="mb-1">
-                    <details :open="searchQuery.length > 0 || true" class="group/details">
-                        <summary
-                            class="py-2 px-3 hover:bg-base-200 rounded-lg text-base-content/80 font-medium transition-all group-open/details:text-primary">
-                            <i
-                                class="ri-arrow-right-s-line text-sm opacity-50 transition-transform group-open/details:rotate-90"></i>
-                            <span x-text="group.path" class="truncate flex-1 ml-1" :title="group.path"></span>
-                            <span class="badge badge-ghost badge-xs font-medium" x-text="group.configs.length"></span>
-                        </summary>
-                        <ul class="mt-1 ml-2 border-l-2 border-base-content/10 pl-2 space-y-1.5">
-                            <template x-for="cfg in group.configs" :key="cfg.originalIndex">
-                                <li class="relative group/item">
-                                    <div class="p-0 flex items-center rounded-lg overflow-hidden border-2 border-transparent transition-all"
-                                        :class="{ 'bg-primary/10 border-base-content': selectedIndex === cfg.originalIndex, 'hover:bg-base-200 hover:border-base-content/10': selectedIndex !== cfg.originalIndex }">
-                                        <div class="pl-3 pr-1">
-                                            <input type="checkbox"
-                                                class="checkbox checkbox-primary checkbox-xs rounded border-2 border-base-content"
-                                                :checked="selectedIndices.includes(cfg.originalIndex)"
-                                                @change="toggleSelection(cfg.originalIndex)" />
-                                        </div>
-                                        <a @click="selectConfig(cfg.originalIndex)"
-                                            class="flex-1 flex items-center gap-3 py-2 pl-2 pr-10 cursor-pointer overflow-hidden">
-
-                                            <div :class="{
-                                                'bg-info text-info-content': cfg.method === 'GET',
-                                                'bg-success text-success-content': cfg.method === 'POST',
-                                                'bg-warning text-warning-content': cfg.method === 'PUT',
-                                                'bg-error text-error-content': cfg.method === 'DELETE'
-                                            }"
-                                                class="px-1.5 py-0.5 rounded-sm font-medium font-mono text-[9px] min-w-[36px] text-center uppercase border border-base-content/20">
-                                                <span x-text="cfg.method"></span>
-                                            </div>
-
-                                            <span class="truncate text-xs font-medium flex-1 min-w-0" x-text="cfg.name"
-                                                :class="{ 'text-primary': selectedIndex === cfg.originalIndex }"
-                                                :title="cfg.name"></span>
-                                        </a>
-
-                                        <button type="button" @click.stop="duplicateConfig(cfg.originalIndex)"
-                                            class="absolute right-2 btn btn-xs btn-square btn-ghost opacity-0 group-hover/item:opacity-100 transition-opacity z-10 hover:bg-primary hover:text-primary-content rounded-md border border-base-content/20"
-                                            title="Duplicate">
-                                            <i class="ri-file-copy-line text-sm"></i>
-                                        </button>
-                                    </div>
-                                </li>
+    <!-- Recursive Group Rendering Helper (Defined once) -->
+    <template x-ref="recursiveTemplate">
+        <li class="mb-1 w-full list-none">
+            <details :open="searchQuery.length > 0 || true" class="group/details w-full">
+                <summary
+                    class="py-2 px-3 hover:bg-base-200/50 rounded-xl text-base-content/60 font-bold transition-all group-open/details:text-primary flex items-center cursor-pointer">
+                    <i
+                        class="ri-arrow-right-s-line text-sm opacity-60 transition-transform group-open/details:rotate-90"></i>
+                    <i class="ri-folder-2-line text-sm ml-1 opacity-60"></i>
+                    <span x-text="group.name" class="truncate flex-1 ml-1.5 text-xs" :title="group.fullPath"></span>
+                    <span class="badge badge-sm badge-ghost font-bold opacity-60"
+                        x-text="group.configs.length + group.children.length"></span>
+                </summary>
+                <ul class="mt-1 ml-2 border-l border-base-200 pl-2 space-y-1 w-full list-none">
+                    <!-- Nested Children (Sub-folders) -->
+                    <template x-for="childGroup in group.children" :key="childGroup.fullPath">
+                        <div x-data="{ group: childGroup }">
+                            <template x-if="true" x-teleport="self">
+                                <template x-if="group">
+                                    <div x-html="$refs.recursiveTemplate.innerHTML"></div>
+                                </template>
                             </template>
-                        </ul>
-                    </details>
+                        </div>
+                    </template>
+
+                    <!-- Configs in this folder -->
+                    <template x-for="cfg in group.configs" :key="cfg.originalIndex">
+                        <li class="relative group/item">
+                            <div class="p-0 flex items-center rounded-xl overflow-hidden transition-all"
+                                :class="{ 'bg-primary/5 text-primary': selectedIndex === cfg.originalIndex, 'hover:bg-base-200/50': selectedIndex !== cfg.originalIndex }">
+                                <div class="pl-3 pr-1">
+                                    <input type="checkbox"
+                                        class="checkbox checkbox-primary checkbox-xs rounded-md border-base-300"
+                                        :checked="selectedIndices.includes(cfg.originalIndex)"
+                                        @change="toggleSelection(cfg.originalIndex)" />
+                                </div>
+                                <a @click="selectConfig(cfg.originalIndex)"
+                                    class="flex-1 flex items-center gap-3 py-2 pl-2 pr-10 cursor-pointer overflow-hidden">
+                                    <div :class="getMethodBadgeClass(cfg.method)"
+                                        class="px-2 py-0.5 rounded-md font-bold font-mono text-[9px] min-w-[38px] text-center uppercase border">
+                                        <span x-text="cfg.method"></span>
+                                    </div>
+                                    <div class="flex flex-col flex-1 min-w-0 py-1">
+                                        <span class="truncate text-xs font-semibold" x-text="cfg.name"
+                                            :class="{ 'text-primary': selectedIndex === cfg.originalIndex }"
+                                            :title="cfg.name"></span>
+                                        <span class="truncate text-[9px] opacity-50 font-mono" x-text="cfg.path"
+                                            :title="cfg.path"></span>
+                                    </div>
+                                </a>
+                                <button type="button" @click.stop="duplicateConfig(cfg.originalIndex)"
+                                    class="absolute right-2 btn btn-xs btn-square btn-ghost opacity-0 group-hover/item:opacity-100 transition-opacity z-10 hover:bg-primary/10 hover:text-primary rounded-lg">
+                                    <i class="ri-file-copy-line text-sm"></i>
+                                </button>
+                            </div>
+                        </li>
+                    </template>
+                </ul>
+            </details>
+        </li>
+    </template>
+
+    <div class="flex-1 overflow-y-auto custom-scrollbar">
+        <ul class="menu menu-sm w-full p-3 pb-24 gap-1">
+            <!-- Root Configs (e.g. path is just "/") -->
+            <template x-for="cfg in (groupedConfigs.rootConfigs || [])" :key="cfg.originalIndex">
+                <li class="relative group/item">
+                    <div class="p-0 flex items-center rounded-xl overflow-hidden transition-all"
+                        :class="{ 'bg-primary/5 text-primary': selectedIndex === cfg.originalIndex, 'hover:bg-base-200/50': selectedIndex !== cfg.originalIndex }">
+                        <!-- ... (same config item UI) ... -->
+                        <div class="pl-3 pr-1">
+                            <input type="checkbox"
+                                class="checkbox checkbox-primary checkbox-xs rounded-md border-base-300"
+                                :checked="selectedIndices.includes(cfg.originalIndex)"
+                                @change="toggleSelection(cfg.originalIndex)" />
+                        </div>
+                        <a @click="selectConfig(cfg.originalIndex)"
+                            class="flex-1 flex items-center gap-3 py-2 pl-2 pr-10 cursor-pointer overflow-hidden">
+                            <div :class="getMethodBadgeClass(cfg.method)"
+                                class="px-2 py-0.5 rounded-md font-bold font-mono text-[9px] min-w-[38px] text-center uppercase border">
+                                <span x-text="cfg.method"></span>
+                            </div>
+                            <div class="flex flex-col flex-1 min-w-0 py-1">
+                                <span class="truncate text-xs font-semibold" x-text="cfg.name"
+                                    :class="{ 'text-primary': selectedIndex === cfg.originalIndex }"
+                                    :title="cfg.name"></span>
+                                <span class="truncate text-[9px] opacity-50 font-mono" x-text="cfg.path"
+                                    :title="cfg.path"></span>
+                            </div>
+                        </a>
+                        <button type="button" @click.stop="duplicateConfig(cfg.originalIndex)"
+                            class="absolute right-2 btn btn-xs btn-square btn-ghost opacity-0 group-hover/item:opacity-100 transition-opacity z-10 hover:bg-primary/10 hover:text-primary rounded-lg">
+                            <i class="ri-file-copy-line text-sm"></i>
+                        </button>
+                    </div>
                 </li>
+            </template>
+
+            <!-- Recursive Tree Rendering -->
+            <template x-for="groupItem in (groupedConfigs.tree || [])" :key="groupItem.fullPath">
+                <div x-data="{ group: groupItem }">
+                    <div x-html="$refs.recursiveTemplate.innerHTML"></div>
+                </div>
             </template>
         </ul>
 
-        <!-- Footer to indicate end of list -->
-        <div class="px-5 pb-16 opacity-40 text-center select-none">
+        <!-- Footer -->
+        <div class="px-5 pb-16 opacity-30 text-center select-none">
             <div class="flex flex-col items-center gap-2">
-                <div class="h-[2px] w-12 bg-base-content"></div>
-                <span class="text-[9px] font-medium uppercase tracking-[0.2em]">End of Archive</span>
-                <div class="h-[2px] w-12 bg-base-content"></div>
+                <div class="h-px w-10 bg-base-content/20"></div>
+                <span class="text-[9px] font-bold uppercase tracking-widest opacity-60">End of Archive</span>
+                <div class="h-px w-10 bg-base-content/20"></div>
             </div>
         </div>
     </div>
